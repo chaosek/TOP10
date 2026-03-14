@@ -118,6 +118,29 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .question-card.anim { animation:slideIn .3s ease-out; }
 
 .ai-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); border-radius:8px; padding:3px 10px; font-size:0.7rem; font-weight:700; color:var(--purple); letter-spacing:1px; text-transform:uppercase; }
+
+/* 18+ PILL */
+.cat-pill-18 { background:linear-gradient(135deg,#ff0055,#ff6b9d) !important; border-color:#ff0055 !important; color:white !important; font-weight:900 !important; }
+.cat-pill-18.active { box-shadow:0 0 20px rgba(255,0,85,0.5); }
+.cat-pill-18:hover { box-shadow:0 0 14px rgba(255,0,85,0.4); transform:scale(1.05); }
+
+/* 18+ CARD MODE */
+.question-card.mode-18 { border-color:rgba(255,0,85,0.3); }
+.question-card.mode-18::before { background:linear-gradient(90deg,#ff0055,#ff6b9d,#ff0055); }
+.q-badge-18 { background:linear-gradient(135deg,rgba(255,0,85,0.2),rgba(255,107,157,0.2)); border:1px solid rgba(255,0,85,0.4); color:#ff6b9d !important; }
+
+/* AGE GATE MODAL */
+.age-gate { position:fixed; inset:0; background:rgba(10,9,20,0.95); z-index:2000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(10px); }
+.age-gate-box { background:var(--card); border:1px solid rgba(255,0,85,0.3); border-radius:28px; padding:40px 32px; max-width:380px; width:100%; text-align:center; position:relative; overflow:hidden; }
+.age-gate-box::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#ff0055,#ff6b9d); }
+.age-gate-emoji { font-size:3.5rem; margin-bottom:16px; display:block; }
+.age-gate-box h2 { font-family:'Fraunces',serif; font-style:italic; font-size:2rem; color:var(--text); margin-bottom:10px; }
+.age-gate-box p { color:var(--muted); font-size:0.9rem; line-height:1.6; margin-bottom:28px; }
+.age-gate-btns { display:flex; gap:10px; }
+.age-yes { flex:1; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg,#ff0055,#ff6b9d); color:white; font-family:'DM Sans',sans-serif; font-weight:800; font-size:1rem; cursor:pointer; transition:all .2s; }
+.age-yes:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(255,0,85,0.4); }
+.age-no { flex:1; padding:14px; border-radius:14px; border:1px solid var(--border); background:var(--card2); color:var(--muted); font-family:'DM Sans',sans-serif; font-weight:800; font-size:1rem; cursor:pointer; transition:all .2s; }
+.age-no:hover { color:var(--text); border-color:var(--muted); }
 </style>
 </head>
 <body>
@@ -184,6 +207,19 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- AGE GATE -->
+<div class="age-gate" id="age-gate" style="display:none">
+  <div class="age-gate-box">
+    <span class="age-gate-emoji">🔞</span>
+    <h2>Pouze pro dospělé</h2>
+    <p>Tato kategorie obsahuje pikantní a místy mírně vulgární otázky určené pouze pro dospělé hráče 18+.<br><br>Potvrzuješ, že ti je 18 nebo více let?</p>
+    <div class="age-gate-btns">
+      <button class="age-yes" onclick="confirmAge()">Ano, je mi 18+ 🔥</button>
+      <button class="age-no" onclick="denyAge()">Ne, zpět</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -812,6 +848,124 @@ const QUESTIONS = [
 {c:"Nakupování",q:"TOP 10 věcí co jsou na zákaznickém věrnostním programu záhadně bezcenné"},
 {c:"Nakupování",q:"TOP 10 způsobů jak limitovaná edice vytvoří umělou touhu po zbytečnosti"},
 {c:"Nakupování",q:"TOP 10 věcí co každý kupující zažije při první koupi na Vinted nebo bazaři"},
+// ── 18+ DOSPĚLÍ ─────────────────────────────────
+{c:"18+",q:"TOP 10 věcí, které si říkáš při prvním přespání u nové osoby"},
+{c:"18+",q:"TOP 10 zvuků v sousedním bytě v noci, které tě přimějí nosit sluchátka"},
+{c:"18+",q:"TOP 10 výmluv proč 'dnes ne' i když jsi dřív říkal že budeš vždy chtít"},
+{c:"18+",q:"TOP 10 věcí co partneři tvrdí že nevadí ale ve skutečnosti vadí hodně"},
+{c:"18+",q:"TOP 10 situací kdy načasování v ložnici je naprosto katastrofální"},
+{c:"18+",q:"TOP 10 věcí co si lidi koupí anonymně online a pak jsou nervózní při doručení"},
+{c:"18+",q:"TOP 10 způsobů jak ranní nálada jednoho partnera zmaří plány druhého"},
+{c:"18+",q:"TOP 10 věcí, které říkáš v zápalu vášně co jsou ve světle dne trochu trapné"},
+{c:"18+",q:"TOP 10 situací kdy 'jen 5 minut' je nejoptimističtější odhad v dějinách lidstva"},
+{c:"18+",q:"TOP 10 věcí co jsou v ložnici záhadně vždy na špatném místě ve špatný čas"},
+{c:"18+",q:"TOP 10 způsobů jak děti změní intimní život páru — brutálně upřímný přehled"},
+{c:"18+",q:"TOP 10 věcí co partneři navzájem tajně googlaují a nikdy to nepřiznají"},
+{c:"18+",q:"TOP 10 situací kde popis 'spontánní sex' je čistý marketing"},
+{c:"18+",q:"TOP 10 způsobů jak si lidi namlouvají že jejich sexuální život je normální i když není"},
+{c:"18+",q:"TOP 10 věcí co jsou na 'sexy výletu pro dva' záhadně méně sexy než zní v reklamě"},
+{c:"18+",q:"TOP 10 výmluv proč odložit sex 'na víkend' a víkend nikdy nepřijde"},
+{c:"18+",q:"TOP 10 poloh které zní na papíře skvěle ale v praxi jsou logistická noční můra"},
+{c:"18+",q:"TOP 10 věcí co se odehraje při prvním sexu s někým novým co nikdo nezmíní"},
+{c:"18+",q:"TOP 10 způsobů jak pornografie úplně zkreslí představy o reálném sexu"},
+{c:"18+",q:"TOP 10 věcí co každý zažil při sexu co ho zastavilo v půli cesty"},
+{c:"18+",q:"TOP 10 nejhorších míst kde jsi zkusil sex a proč to byl špatný nápad"},
+{c:"18+",q:"TOP 10 způsobů jak 'sex na jednu noc' je v hlavě jedné ze stran naprosto jinak"},
+{c:"18+",q:"TOP 10 věcí co jsou na sexu ve sprše romantické v teorii a katastrofální v praxi"},
+{c:"18+",q:"TOP 10 způsobů jak partner pozná že jsi předstíral/a i když jsi myslel/a že ne"},
+{c:"18+",q:"TOP 10 nejhloupějších věcí co lidi dělají hned po sexu"},
+{c:"18+",q:"TOP 10 věcí co jsou na sexting naprosto zdrcující při odeslání špatné osobě"},
+{c:"18+",q:"TOP 10 způsobů jak Kamasutra je přeceňovaná jako praktická příručka"},
+{c:"18+",q:"TOP 10 věcí co nám o sexu řekla sexuální výchova ve škole a byly naprosté nesmysly"},
+{c:"18+",q:"TOP 10 situací kdy soundtrack z vedlejšího pokoje na dovolené je nevítaný"},
+{c:"18+",q:"TOP 10 způsobů jak sexuální apetit jednoho partnera nesedí tomu druhému — co s tím"},
+{c:"18+",q:"TOP 10 věcí co jsou na 'po sexu' stejně důležité jako sex sám"},
+{c:"18+",q:"TOP 10 sexuálních fantasií co jsou v praxi naprosto nerealizovatelné bez smíchu"},
+{c:"18+",q:"TOP 10 věcí co lidi říkají o velikosti a proč na tom (ne)záleží"},
+{c:"18+",q:"TOP 10 způsobů jak ranní sex je absolutně jiná kategorie než noční"},
+{c:"18+",q:"TOP 10 věcí co jsou na 'hře na cizince v baru' záhadně trapné v provedení"},
+{c:"18+",q:"TOP 10 situací kdy mazlíček v ložnici je naprosto nevítaný divák"},
+{c:"18+",q:"TOP 10 způsobů jak se 'otevřeme sexuální komunikaci' liší od skutečné praxe"},
+{c:"18+",q:"TOP 10 věcí co jsou v erotické literatuře fyziologicky naprosto nemožné"},
+{c:"18+",q:"TOP 10 situací kdy dětský monitor v jiném pokoji je technologická past"},
+{c:"18+",q:"TOP 10 způsobů jak dlouhý vztah pohřbí sexuální spontaneitu — a jak ji vzkřísit"},
+{c:"18+",q:"TOP 10 věcí co jsou na sexu v autě romantické v 20 a šílené v 40"},
+{c:"18+",q:"TOP 10 nejhorších momentů pro zazvoněný telefon v ložnici"},
+{c:"18+",q:"TOP 10 způsobů jak 'nová poloha' doporučená v časopise skončí u ortopeda"},
+{c:"18+",q:"TOP 10 věcí co by nikdo neřekl o průměrné délce průměrného sexu"},
+{c:"18+",q:"TOP 10 situací kdy soused zaklepe na zeď a máš pravdu i špatný pocit zároveň"},
+{c:"18+",q:"TOP 10 způsobů jak 'mluvit o sexu s partnerem' je těžší než samotný sex"},
+{c:"18+",q:"TOP 10 věcí co jsou na Valentýnu záhadně větší tlak než radost"},
+{c:"18+",q:"TOP 10 způsobů jak se libido mění se stresem ze zaměstnání — bohužel poctivý žebříček"},
+{c:"18+",q:"TOP 10 věcí co jsou v sexshopech záhadně stydlivé koupit přestože tam všichni jdou za tím"},
+{c:"18+",q:"TOP 10 situací kde 'role play' scénář se rozpadne smíchem dřív než začne"},
+{c:"18+",q:"TOP 10 způsobů jak alkohol změní odvahu ale sníží výkon — tragická rovnice"},
+{c:"18+",q:"TOP 10 věcí co jsou na jednonočním dobrodružství záhadně jiné ráno"},
+{c:"18+",q:"TOP 10 situací kdy zpráva odeslaná v noci se zdá ráno jako geniální či katastrofální"},
+{c:"18+",q:"TOP 10 způsobů jak zranění při sexu jsou méně vzácné než si myslíš"},
+{c:"18+",q:"TOP 10 věcí co každý pár zažil v manželské posteli čeho litují"},
+{c:"18+",q:"TOP 10 situací kdy 'rozsvítíme nebo zhasneme' je překvapivě složitá otázka"},
+{c:"18+",q:"TOP 10 způsobů jak se sexuální sebevědomí mění s věkem — naštěstí k lepšímu"},
+{c:"18+",q:"TOP 10 věcí co jsou na 'sexy outfitu' pro partnera záhadně jinak vnímané"},
+{c:"18+",q:"TOP 10 situací kdy 'mlčíme nebo komunikujeme' v ložnici rozhodne o zbytku vztahu"},
+{c:"18+",q:"TOP 10 způsobů jak romantická dovolená pro dva skončí bez romantiky"},
+{c:"18+",q:"TOP 10 věcí co říkají lidi o délce předehry a co je realita"},
+{c:"18+",q:"TOP 10 situací kdy zapomenout zavřít záclony má sociální následky"},
+{c:"18+",q:"TOP 10 způsobů jak 'sex jsme nevynechali ani den' mýtus vypadá po roce vztahu"},
+{c:"18+",q:"TOP 10 věcí co jsou na párové terapii zaměřené na sexuální život záhadně osvobozující"},
+{c:"18+",q:"TOP 10 situací kdy sousedé jsou příliš dobře informováni o tvém intimním životě"},
+{c:"18+",q:"TOP 10 způsobů jak první sex po delší pauze je překvapivě záhadný"},
+{c:"18+",q:"TOP 10 věcí co jsou na 'divokém víkendu' po rodičovské dovolené záhadně jiné"},
+{c:"18+",q:"TOP 10 situací kdy telefon s oznámeními v nočním stolku je sabotér"},
+{c:"18+",q:"TOP 10 způsobů jak různé hvězdné konstelace ovlivňují sex — satirický pohled"},
+{c:"18+",q:"TOP 10 věcí co jsou na sexu v přírodě romantické v Instagramu a nepříjemné v realitě"},
+{c:"18+",q:"TOP 10 situací kdy jméno ex říct při sexu je konec vztahu"},
+{c:"18+",q:"TOP 10 způsobů jak sexuální rutina v dlouhém vztahu není nutně špatná věc"},
+{c:"18+",q:"TOP 10 věcí co jsou na 'průvodci lepším sexem' v ženských časopisech absurdní"},
+{c:"18+",q:"TOP 10 situací kdy dospělé dítě nečekaně přijde domů je test psychické odolnosti rodičů"},
+{c:"18+",q:"TOP 10 způsobů jak stárnutí těla mění přístup k sexualitě — s humorem"},
+{c:"18+",q:"TOP 10 věcí co jsou na erotických filmech záhadně špatná příprava na reálný život"},
+{c:"18+",q:"TOP 10 situací kde 'ticho v ložnici' není vůbec sign dobrých věcí"},
+{c:"18+",q:"TOP 10 způsobů jak masturbace a partnerský sex jsou záhadně odlišné planety"},
+{c:"18+",q:"TOP 10 věcí co jsou na prvním sexu po rozchodu záhadně smutné i osvobozující"},
+{c:"18+",q:"TOP 10 situací kdy smích během sexu je záchrana nebo katastrofa"},
+{c:"18+",q:"TOP 10 způsobů jak libido reaguje na stres, jídlo, cvičení a spánek — pořadí překvapí"},
+{c:"18+",q:"TOP 10 věcí co jsou na online sex průzkumech záhadně odvážné přiznat anonymně"},
+{c:"18+",q:"TOP 10 situací kdy 'potichu kvůli dětem' je nový normál a co s tím"},
+{c:"18+",q:"TOP 10 způsobů jak muži a ženy vnímají 'dostatečnou frekvenci' sexu — spoiler: jinak"},
+{c:"18+",q:"TOP 10 věcí co jsou na sex terapeutovi záhadně normalizující"},
+{c:"18+",q:"TOP 10 situací kdy 'jen procvičuji jógu' jako výmluva opravdu nefunguje"},
+{c:"18+",q:"TOP 10 způsobů jak partnerův chrápání je sexy killer číslo jedna v průzkumech"},
+{c:"18+",q:"TOP 10 věcí co by tvoje postel prozradila o tvém vztahu kdyby mohla mluvit"},
+{c:"18+",q:"TOP 10 situací kde 'to byl jen sen' je nejpoužívanější výmluva pro ranní přiznání"},
+{c:"18+",q:"TOP 10 způsobů jak se mění sexuální prioritní list od 20 do 50 let"},
+{c:"18+",q:"TOP 10 věcí co jsou na párovém masáži záhadně méně relaxační než sliboval leták"},
+{c:"18+",q:"TOP 10 situací kdy slova 'musíme si promluvit' po sexu jsou devět nejděsivějších slov"},
+{c:"18+",q:"TOP 10 způsobů jak technologie komplikuje intimní život způsoby které generace před námi neznala"},
+{c:"18+",q:"TOP 10 věcí co jsou na nočním stolku průměrného Čecha co by ho prozradily"},
+{c:"18+",q:"TOP 10 situací kdy soused na schodišti příliš dobře ví co se u tebe v pátek dělo"},
+{c:"18+",q:"TOP 10 způsobů jak 'nechci tě vzbudit' je v praxi naprosto selektivní"},
+{c:"18+",q:"TOP 10 věcí co jsou na průměrném trvání průměrného sexu záhadně odlišné od průzkumů"},
+{c:"18+",q:"TOP 10 situací kde 'pojďme být spontánní' vyžaduje 3 hodiny přípravy"},
+{c:"18+",q:"TOP 10 způsobů jak krize středního věku ovlivní sexuální dynamiku páru"},
+{c:"18+",q:"TOP 10 věcí co jsou na fetiších záhadně běžnější než si průměrný člověk myslí"},
+{c:"18+",q:"TOP 10 situací kdy hotelová zeď je záhadně tenčí než byste si přáli"},
+{c:"18+",q:"TOP 10 způsobů jak porno hub statistiky odhalují o národních preferencích záhadně vtipné věci"},
+{c:"18+",q:"TOP 10 věcí co jsou na průměrné české ložnici záhadně neromantické"},
+{c:"18+",q:"TOP 10 situací kdy záda, kolena nebo kyčle se ozývají v nejméně vhodný moment"},
+{c:"18+",q:"TOP 10 způsobů jak se sexuální sebevědomí dá zlepšit bez jediného tipu z Cosmopolitanu"},
+{c:"18+",q:"TOP 10 věcí co jsou na průměrné české sexuální fantasii záhadně specifické"},
+{c:"18+",q:"TOP 10 situací kdy 'přišel jsem se zeptat na šálek cukru' soused je záhadně špatně načasovaný"},
+{c:"18+",q:"TOP 10 způsobů jak hormonální antikoncepce mění libido způsobem co nikdo neřekne"},
+{c:"18+",q:"TOP 10 věcí co jsou na 50 shades of Grey záhadně nerealistické jako návod"},
+{c:"18+",q:"TOP 10 situací kdy se v manželském životě musíte 'domluvit na termínu' a proč to není smutné"},
+{c:"18+",q:"TOP 10 způsobů jak lidé zjistí co chtějí v ložnici až ve 40 a proč to trvalo tak dlouho"},
+{c:"18+",q:"TOP 10 věcí co jsou na nahých selfie záhadně rizikovější než se zdá"},
+{c:"18+",q:"TOP 10 situací kdy snídaně v posteli je romantická nebo průšvih záleží na jediném detailu"},
+{c:"18+",q:"TOP 10 způsobů jak wellness průmysl monetizuje sexuální nejistoty"},
+{c:"18+",q:"TOP 10 věcí co jsou na průměrném 'sexy víkendu v hotelu' záhadně podobné normálnímu víkendu"},
+{c:"18+",q:"TOP 10 situací kdy upřímnost v ložnici je nejlepší afrodiziakum i největší risk"},
+{c:"18+",q:"TOP 10 způsobů jak spánek v různých pokojích zachrání vztah i sex life zároveň"},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -877,19 +1031,48 @@ let currentCat = 'Vše';
 //  CATEGORIES
 // ═══════════════════════════════════════════════════
 function buildCats() {
-  const cats = ['Vše', ...new Set(QUESTIONS.map(q=>q.c))];
+  const otherCats = [...new Set(QUESTIONS.filter(q=>q.c!=='18+').map(q=>q.c))];
+  const cats = ['Vše', '18+', ...otherCats];
   const el = document.getElementById('cats');
-  el.innerHTML = cats.map(c=>`
-    <div class="cat-pill ${c==='Vše'?'active':''}" onclick="filterCat('${c}')">${c}</div>
-  `).join('');
+  el.innerHTML = cats.map(c => {
+    const is18 = c === '18+';
+    const isActive = c === 'Vše';
+    return `<div class="cat-pill ${is18 ? 'cat-pill-18' : ''} ${isActive ? 'active' : ''}" onclick="filterCat('${c}')">${is18 ? '🔞 18+' : c}</div>`;
+  }).join('');
 }
 
+let ageConfirmed = !!sessionStorage.getItem('top10_age18');
+let pendingCat = null;
+
 function filterCat(cat) {
+  if(cat === '18+' && !ageConfirmed) {
+    pendingCat = cat;
+    document.getElementById('age-gate').style.display = 'flex';
+    return;
+  }
+  applyFilter(cat);
+}
+
+function confirmAge() {
+  ageConfirmed = true;
+  sessionStorage.setItem('top10_age18', '1');
+  document.getElementById('age-gate').style.display = 'none';
+  if(pendingCat) { applyFilter(pendingCat); pendingCat = null; }
+}
+
+function denyAge() {
+  pendingCat = null;
+  document.getElementById('age-gate').style.display = 'none';
+}
+
+function applyFilter(cat) {
   currentCat = cat;
-  document.querySelectorAll('.cat-pill').forEach(p=>{
-    p.classList.toggle('active', p.textContent===cat);
+  document.querySelectorAll('.cat-pill').forEach(p => {
+    const label = p.textContent.trim();
+    const match = cat === '18+' ? label === '🔞 18+' : label === cat;
+    p.classList.toggle('active', match);
   });
-  filtered = cat==='Vše' ? [...allQ] : allQ.filter(q=>q.c===cat);
+  filtered = cat === 'Vše' ? [...allQ] : allQ.filter(q => q.c === cat);
   seen.clear();
   nextQuestion();
 }
@@ -911,9 +1094,13 @@ function showQ(text, cat, ai) {
   card.classList.remove('anim');
   void card.offsetWidth;
   card.classList.add('anim');
+  const is18 = cat === '18+';
+  card.classList.toggle('mode-18', is18);
+  const badgeClass = is18 ? 'q-badge q-badge-18' : 'q-badge';
+  document.getElementById('q-cat').className = badgeClass;
   document.getElementById('q-cat').innerHTML = ai
     ? `<span class="ai-badge">✦ AI</span> ${cat}`
-    : cat;
+    : (is18 ? '🔞 ' + cat : cat);
   document.getElementById('q-text').textContent = text;
   const isFav = favorites.some(f=>f.q===text);
   const fb = document.getElementById('btn-fav');
