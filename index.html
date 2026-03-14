@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOP 10 · Generátor otázek</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,900;1,700&family=DM+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0e17;
+  --card: #1a1828;
+  --card2: #211f32;
+  --accent: #ff6b35;
+  --accent2: #ffd166;
+  --teal: #06d6a0;
+  --purple: #a855f7;
+  --text: #fffffe;
+  --muted: #a8a4c0;
+  --border: rgba(255,255,255,0.07);
+  --red: #ff4d6d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; opacity:0.4; }
+.blob { position:fixed; border-radius:50%; filter:blur(80px); pointer-events:none; z-index:0; opacity:0.15; }
+.blob1 { width:500px; height:500px; background:var(--accent); top:-150px; left:-150px; }
+.blob2 { width:400px; height:400px; background:var(--purple); bottom:-100px; right:-100px; }
+.blob3 { width:300px; height:300px; background:var(--teal); top:40%; left:50%; transform:translateX(-50%); }
+
+.wrap { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:32px 16px 80px; }
+
+.header { text-align:center; margin-bottom:32px; }
+.logo { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(3.5rem,14vw,6rem); font-weight:900; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; letter-spacing:-2px; }
+.logo-sub { font-size:0.75rem; letter-spacing:6px; text-transform:uppercase; color:var(--muted); margin-top:6px; font-weight:600; }
+
+/* API KEY PANEL */
+.api-panel { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:18px 20px; margin-bottom:20px; }
+.api-panel-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+.api-panel-header h3 { font-size:0.82rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:8px; }
+.api-status { display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; font-weight:700; padding:4px 10px; border-radius:20px; }
+.api-status.ok { background:rgba(6,214,160,0.15); color:var(--teal); border:1px solid rgba(6,214,160,0.3); }
+.api-status.missing { background:rgba(255,77,109,0.1); color:var(--red); border:1px solid rgba(255,77,109,0.2); }
+.api-body { margin-top:14px; display:none; }
+.api-body.open { display:block; }
+.api-row { display:flex; gap:8px; margin-bottom:8px; }
+.api-input { flex:1; background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:11px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.88rem; outline:none; transition:border .2s; }
+.api-input:focus { border-color:var(--purple); }
+.api-save-btn { background:var(--purple); color:white; border:none; border-radius:12px; padding:11px 18px; font-weight:800; font-size:0.85rem; cursor:pointer; white-space:nowrap; transition:opacity .2s; }
+.api-save-btn:hover { opacity:0.85; }
+.api-clear-btn { background:rgba(255,77,109,0.15); color:var(--red); border:1px solid rgba(255,77,109,0.2); border-radius:12px; padding:11px 14px; font-weight:800; font-size:0.85rem; cursor:pointer; transition:opacity .2s; }
+.api-clear-btn:hover { opacity:0.75; }
+.api-hint { font-size:0.75rem; color:var(--muted); line-height:1.5; }
+.api-hint a { color:var(--purple); text-decoration:none; }
+.api-chevron { color:var(--muted); font-size:0.9rem; transition:transform .2s; }
+.api-chevron.open { transform:rotate(180deg); }
+
+/* CATS */
+.cats-scroll { display:flex; gap:8px; overflow-x:auto; padding:4px 0 12px; scrollbar-width:none; margin-bottom:20px; }
+.cats-scroll::-webkit-scrollbar { display:none; }
+.cat-pill { flex-shrink:0; padding:7px 16px; border-radius:50px; border:1.5px solid var(--border); background:var(--card); color:var(--muted); font-size:0.8rem; font-weight:600; cursor:pointer; transition:all .2s; white-space:nowrap; }
+.cat-pill:hover { border-color:var(--accent); color:var(--accent); }
+.cat-pill.active { background:var(--accent); border-color:var(--accent); color:white; }
+
+/* CARD */
+.question-card { background:var(--card); border:1px solid var(--border); border-radius:28px; padding:36px 32px; position:relative; overflow:hidden; min-height:260px; display:flex; flex-direction:column; justify-content:space-between; transition:all .3s; cursor:pointer; }
+.question-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--teal)); }
+.question-card:hover { border-color:rgba(255,107,53,0.3); transform:translateY(-2px); box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+.q-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:20px; }
+.q-badge { background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:6px 14px; font-size:0.72rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent2); white-space:nowrap; }
+.q-num { font-family:'Fraunces',serif; font-size:4rem; font-weight:900; color:var(--border); line-height:1; user-select:none; }
+.q-text { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(1.3rem,4vw,1.85rem); font-weight:700; line-height:1.3; color:var(--text); flex:1; }
+.q-hint { font-size:0.78rem; color:var(--muted); margin-top:20px; display:flex; align-items:center; gap:6px; }
+
+/* ACTIONS */
+.actions { display:flex; gap:10px; margin-top:16px; }
+.btn { flex:1; padding:15px 20px; border-radius:16px; border:none; font-family:'DM Sans',sans-serif; font-weight:800; font-size:0.95rem; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-next { background:var(--accent); color:white; }
+.btn-next:hover { background:#ff8255; transform:translateY(-1px); box-shadow:0 8px 24px rgba(255,107,53,0.4); }
+.btn-next:active { transform:translateY(1px); }
+.btn-ai { background:linear-gradient(135deg,var(--purple),#7c3aed); color:white; }
+.btn-ai:hover { opacity:0.9; transform:translateY(-1px); box-shadow:0 8px 24px rgba(168,85,247,0.4); }
+.btn-ai:active { transform:translateY(1px); }
+.btn-ai:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.btn-fav { background:var(--card2); border:1px solid var(--border); color:var(--muted); flex:0; padding:15px 18px; }
+.btn-fav:hover { color:var(--accent2); border-color:var(--accent2); }
+.btn-fav.active { color:var(--accent2); border-color:var(--accent2); background:rgba(255,209,102,0.1); }
+
+/* AI loading */
+.ai-loading { display:none; text-align:center; padding:16px; color:var(--muted); font-size:0.9rem; }
+.ai-loading.show { display:block; }
+.spinner { display:inline-block; width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--purple); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:8px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* STATS */
+.stats { display:flex; gap:12px; margin-top:20px; }
+.stat { flex:1; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px 16px; text-align:center; }
+.stat-n { font-family:'Fraunces',serif; font-size:1.8rem; font-weight:900; color:var(--accent); }
+.stat-l { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+
+/* FAVORITES */
+.fav-section { margin-top:24px; }
+.fav-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.fav-header h3 { font-size:0.8rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); font-weight:700; }
+.fav-list { display:flex; flex-direction:column; gap:8px; }
+.fav-item { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px 18px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:all .2s; }
+.fav-item:hover { border-color:var(--accent2); }
+.fi-cat { font-size:0.7rem; color:var(--accent2); font-weight:800; letter-spacing:1px; text-transform:uppercase; min-width:70px; }
+.fi-text { font-size:0.88rem; color:var(--text); flex:1; }
+.fi-del { color:var(--muted); font-size:1rem; opacity:0.4; transition:opacity .2s; }
+.fav-item:hover .fi-del { opacity:1; }
+
+.swipe-hint { text-align:center; margin-top:10px; font-size:0.72rem; color:rgba(255,255,255,0.2); letter-spacing:1px; }
+
+.toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--teal); color:#0f0e17; padding:10px 24px; border-radius:50px; font-weight:800; font-size:0.85rem; opacity:0; transition:all .3s; pointer-events:none; z-index:999; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+@keyframes slideIn { from { opacity:0; transform:translateY(16px) scale(0.98); } to { opacity:1; transform:none; } }
+.question-card.anim { animation:slideIn .3s ease-out; }
+
+.ai-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); border-radius:8px; padding:3px 10px; font-size:0.7rem; font-weight:700; color:var(--purple); letter-spacing:1px; text-transform:uppercase; }
+</style>
+</head>
+<body>
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<div class="wrap">
+  <div class="header">
+    <div class="logo">TOP 10</div>
+    <div class="logo-sub">Generátor otázek · 2000+ karet + AI</div>
+  </div>
+
+  <!-- API KEY PANEL -->
+  <div class="api-panel">
+    <div class="api-panel-header" onclick="toggleApiPanel()">
+      <h3>🔑 Claude AI klíč <span class="api-status missing" id="api-status">● Nezadán</span></h3>
+      <span class="api-chevron" id="api-chevron">▼</span>
+    </div>
+    <div class="api-body" id="api-body">
+      <div class="api-row">
+        <input type="password" class="api-input" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off" />
+        <button class="api-save-btn" onclick="saveApiKey()">Uložit</button>
+        <button class="api-clear-btn" onclick="clearApiKey()">✕</button>
+      </div>
+      <p class="api-hint">Klíč se uloží jen do tohoto zařízení (localStorage). Získáš ho zdarma na <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. Bez klíče funguje 2000+ otázek normálně.</p>
+    </div>
+  </div>
+
+  <div class="cats-scroll" id="cats"></div>
+
+  <div class="question-card" id="qcard" onclick="nextQuestion()">
+    <div>
+      <div class="q-top">
+        <div class="q-badge" id="q-cat">Načítám...</div>
+        <div class="q-num">10</div>
+      </div>
+      <div class="q-text" id="q-text">Klepni pro začátek 👆</div>
+    </div>
+    <div class="q-hint"><span>💡</span> Každý hráč hádá číslo 1–10</div>
+  </div>
+  <div class="swipe-hint">klepni na kartu nebo přejeď prstem</div>
+
+  <div class="ai-loading" id="ai-loading">
+    <span class="spinner"></span> Claude vymýšlí novou otázku...
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-fav" id="btn-fav" onclick="toggleFav(event)" title="Uložit">⭐</button>
+    <button class="btn btn-next" onclick="nextQuestion()">Další →</button>
+    <button class="btn btn-ai" id="btn-ai" onclick="generateAI()">✦ AI otázka</button>
+  </div>
+
+  <div class="stats" style="margin-top:20px;">
+    <div class="stat"><div class="stat-n" id="stat-seen">0</div><div class="stat-l">Zobrazeno</div></div>
+    <div class="stat"><div class="stat-n" id="stat-total">0</div><div class="stat-l">V balíčku</div></div>
+    <div class="stat"><div class="stat-n" id="stat-fav">0</div><div class="stat-l">Oblíbené</div></div>
+  </div>
+
+  <div class="fav-section" id="fav-section" style="display:none">
+    <div class="fav-header"><h3>⭐ Oblíbené otázky</h3></div>
+    <div class="fav-list" id="fav-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  QUESTION BANK — 2000+ otázek
+// ═══════════════════════════════════════════════════════════════
+const QUESTIONS = [
+// ── VZTAHY & RANDĚNÍ ─────────────────────────────
+{c:"Vztahy",q:"TOP 10 věcí, které si řekneš po prvním rande a víš že to nebude ono"},
+{c:"Vztahy",q:"TOP 10 signálů, že ti partner posílá 'jsem naštvaný' zprávu"},
+{c:"Vztahy",q:"TOP 10 důvodů proč lidé nefungují jako pár, ale 'jenom kamarádi'"},
+{c:"Vztahy",q:"TOP 10 věcí, které říkáš místo 'mám tě rád' protože se bojíš"},
+{c:"Vztahy",q:"TOP 10 způsobů jak poznat, že tvůj partner čte zprávy ale neodpovídá"},
+{c:"Vztahy",q:"TOP 10 výmluv proč jít na 'jen jedno pivo' s ex"},
+{c:"Vztahy",q:"TOP 10 věcí, co děláš na záchodě u partnera poprvé"},
+{c:"Vztahy",q:"TOP 10 vět, které znějí romanticky ale jsou varovné signály"},
+{c:"Vztahy",q:"TOP 10 způsobů jak sabotovat sám sebe na Tinderu"},
+{c:"Vztahy",q:"TOP 10 věcí, které si říkáš při procházení exova Instagramu ve 2 ráno"},
+{c:"Vztahy",q:"TOP 10 otázek, které si kladeš po 5 letech v dlouhodobém vztahu"},
+{c:"Vztahy",q:"TOP 10 věcí, které pár řeší místo toho aby řešil skutečný problém"},
+{c:"Vztahy",q:"TOP 10 znaků že jsi zrovna ghostoval nebo byl ghostován"},
+{c:"Vztahy",q:"TOP 10 překvapení při nastěhování se k partnerovi"},
+{c:"Vztahy",q:"TOP 10 věcí, co přijde vhod když jsi zrovna single"},
+{c:"Vztahy",q:"TOP 10 způsobů jak se 'jen přátelé' mění v komplikovaný vztah"},
+{c:"Vztahy",q:"TOP 10 věcí, které pár nikdy nepřizná svým rodičům"},
+{c:"Vztahy",q:"TOP 10 znaků že jste oba chtěli říct 'miluji tě' ale nikdo nezačal"},
+{c:"Vztahy",q:"TOP 10 způsobů jak hádka o nádobí není o nádobí"},
+{c:"Vztahy",q:"TOP 10 věcí, které říká člověk na Tinderu co jsou červené vlajky"},
+{c:"Vztahy",q:"TOP 10 signálů že někdo tě nebaví ale nemá odvahu to říct"},
+{c:"Vztahy",q:"TOP 10 věcí co se změní ve vztahu po prvním roce"},
+{c:"Vztahy",q:"TOP 10 způsobů jak dát partnerovi najevo že jsi naštvaný bez jediného slova"},
+{c:"Vztahy",q:"TOP 10 věcí, které lidi přehlíží v novém vztahu a pak se diví"},
+{c:"Vztahy",q:"TOP 10 způsobů jak párová terapie vyjde jinak než se čeká"},
+{c:"Vztahy",q:"TOP 10 rande míst, která zní romanticky ale jsou katastrofa"},
+{c:"Vztahy",q:"TOP 10 věcí, které ex najednou dělá perfektně s novým partnerem"},
+{c:"Vztahy",q:"TOP 10 důvodů proč je manželství po 20 letech jiné než si představoval"},
+{c:"Vztahy",q:"TOP 10 věcí co každý pár dělá v tajnosti co by nepřiznal"},
+{c:"Vztahy",q:"TOP 10 způsobů jak být single je lepší než lidé říkají"},
+// ── PRÁCE & KANCELÁŘ ─────────────────────────────
+{c:"Práce",q:"TOP 10 způsobů jak přežít poradu která mohla být emailem"},
+{c:"Práce",q:"TOP 10 věcí, které říkáš v práci a myslíš tím něco úplně jiného"},
+{c:"Práce",q:"TOP 10 strategií jak vypadat zaneprázdněně když děláš nic"},
+{c:"Práce",q:"TOP 10 kolegů podle archetypu — ten co jí ostatním oběd, ten co brečí u HR..."},
+{c:"Práce",q:"TOP 10 věcí které ti v práci seberou motivaci rychleji než cokoli jiného"},
+{c:"Práce",q:"TOP 10 emailů, které dáváš do složky 'přečtu zítra' a nikdy je nečteš"},
+{c:"Práce",q:"TOP 10 kancelářských zvuků, které tě pomalu přivádějí k šílenství"},
+{c:"Práce",q:"TOP 10 způsobů jak zjistíš, že jsi na nesprávném místě v práci"},
+{c:"Práce",q:"TOP 10 věcí co se děje na firemním teambuildingu co nikdo nepřizná"},
+{c:"Práce",q:"TOP 10 myšlenek zaměstnance při 'performance review'"},
+{c:"Práce",q:"TOP 10 věcí co jsou na LinkedIn příspěvcích naprosto nesnášenlivé"},
+{c:"Práce",q:"TOP 10 věcí z pracovního pohovoru, které jsou čirý bullshit"},
+{c:"Práce",q:"TOP 10 znaků že firma má toxickou kulturu ale tváří se jinak"},
+{c:"Práce",q:"TOP 10 způsobů jak 'remote work' změní lidi k horšímu i lepšímu"},
+{c:"Práce",q:"TOP 10 věcí, co šéf říká na poradě co jsou nesmysl"},
+{c:"Práce",q:"TOP 10 způsobů jak kolega dá najevo nesouhlas aniž by cokoliv řekl"},
+{c:"Práce",q:"TOP 10 věcí co uděláš první den v novém zaměstnání a pak toho lituju"},
+{c:"Práce",q:"TOP 10 výmluv proč neodpovíš na zprávu od šéfa večer"},
+{c:"Práce",q:"TOP 10 způsobů jak zjistit kdy je správný čas odejít z práce"},
+{c:"Práce",q:"TOP 10 věcí co říká každý na pohovoru a nikdo tomu nevěří"},
+{c:"Práce",q:"TOP 10 způsobů jak firemní kultura ničí lidi pomalu a nepozorovaně"},
+{c:"Práce",q:"TOP 10 věcí, které si každý zaměstnanec myslí o svém šéfovi ale neřekne"},
+{c:"Práce",q:"TOP 10 signálů že kolega dostane výpověď ještě před tím než to ví"},
+{c:"Práce",q:"TOP 10 věcí co jsou na home office skvělé a co jsou past"},
+{c:"Práce",q:"TOP 10 způsobů jak open space kancelář zničí produktivitu"},
+{c:"Práce",q:"TOP 10 věcí, která firma 'nabízí zaměstnancům' co jsou ve skutečnosti bezcenné"},
+{c:"Práce",q:"TOP 10 důvodů proč lidé zůstávají v práci co nesnášejí"},
+{c:"Práce",q:"TOP 10 způsobů jak meeting culture zabíjí kreativitu"},
+{c:"Práce",q:"TOP 10 věcí co se mění když se kamarád stane tvým šéfem"},
+{c:"Práce",q:"TOP 10 způsobů jak poznat že firma je na pokraji propouštění ještě před oznámením"},
+// ── TECHNOLOGIE & INTERNET ───────────────────────
+{c:"Technologie",q:"TOP 10 důvodů proč trvá scrollování Instagramem 'jen minutu' hodinu"},
+{c:"Technologie",q:"TOP 10 věcí, které uděláš místo toho abys pracoval — prokrastinace online"},
+{c:"Technologie",q:"TOP 10 notifikací, které ignoruješ ale nikdy nevypneš"},
+{c:"Technologie",q:"TOP 10 důvodů proč máš 47 záložek otevřených a nevíš proč"},
+{c:"Technologie",q:"TOP 10 způsobů jak poznat, že jsi závislý na telefonu"},
+{c:"Technologie",q:"TOP 10 věcí co uděláš s novým telefonem do 24 hodin a pak toho lituju"},
+{c:"Technologie",q:"TOP 10 důvodů proč lidi sledují na Netflixu věci co jim nedávají"},
+{c:"Technologie",q:"TOP 10 komentářů pod YouTube videem co tě rozesměje víc než video"},
+{c:"Technologie",q:"TOP 10 věcí, které říkáš o AI a přitom jim nerozumíš"},
+{c:"Technologie",q:"TOP 10 způsobů jak technologie slibuje úsporu času ale krade ho"},
+{c:"Technologie",q:"TOP 10 hesel, která používáš i když víš že jsou nebezpečná"},
+{c:"Technologie",q:"TOP 10 věcí co posíláš do skupinového chatu a pak okamžitě lituju"},
+{c:"Technologie",q:"TOP 10 způsobů jak algoritmus ví co chceš sledovat dřív než ty sám"},
+{c:"Technologie",q:"TOP 10 věcí co uděláš při výpadku internetu a zjistíš jak závisíš na něm"},
+{c:"Technologie",q:"TOP 10 způsobů jak sociální sítě zkreslí vnímání reality"},
+{c:"Technologie",q:"TOP 10 věcí co lidi kupují v App Store a nikdy neotevřou"},
+{c:"Technologie",q:"TOP 10 způsobů jak 'chytré' zařízení v domácnosti ti zkomplikuje život"},
+{c:"Technologie",q:"TOP 10 věcí co jsou na moderních telefonech zbytečné funkce"},
+{c:"Technologie",q:"TOP 10 způsobů jak Spotify zná tvůj aktuální životní stav lépe než přátelé"},
+{c:"Technologie",q:"TOP 10 věcí co se ztratí navždy když přijdeš o telefon"},
+{c:"Technologie",q:"TOP 10 způsobů jak online recenze jsou naprosto nespolehlivé"},
+{c:"Technologie",q:"TOP 10 věcí co se změní v životě když na týden vypneš sociální sítě"},
+{c:"Technologie",q:"TOP 10 chyb co uděláš když si koupíš nový laptop"},
+{c:"Technologie",q:"TOP 10 důvodů proč jsou aktualizace softwaru vždy v nejhorší chvíli"},
+{c:"Technologie",q:"TOP 10 věcí co by technologie měla umět ale ještě neumí"},
+{c:"Technologie",q:"TOP 10 způsobů jak moderní TV je příliš chytrá na to aby fungovala"},
+{c:"Technologie",q:"TOP 10 věcí co je nevyhnutelně ztraceno při přechodu na nový telefon"},
+{c:"Technologie",q:"TOP 10 způsobů jak YouTube rabbit hole zničí večer"},
+{c:"Technologie",q:"TOP 10 věcí co by bylo jinak kdyby internet nikdy nevznikl"},
+{c:"Technologie",q:"TOP 10 způsobů jak deepfake a AI obsah mění co věříme"},
+// ── JÍDLO & RESTAURACE ───────────────────────────
+{c:"Jídlo",q:"TOP 10 věcí, co se stane na rodinném grilu co nikdo neplánoval"},
+{c:"Jídlo",q:"TOP 10 způsobů jak poznat dobrou nebo špatnou restauraci před jídlem"},
+{c:"Jídlo",q:"TOP 10 jídel co vypadají skvěle na fotkách ale v realitě jsou zklamání"},
+{c:"Jídlo",q:"TOP 10 věcí, které lidem říkají food blogeři a jsou naprostý nesmysl"},
+{c:"Jídlo",q:"TOP 10 výmluv proč neuvařit a radši objednat"},
+{c:"Jídlo",q:"TOP 10 věcí které se stane v lednici každému kdo žije sám"},
+{c:"Jídlo",q:"TOP 10 jídel co jíš jen sám doma protože se stydíš je jíst na veřejnosti"},
+{c:"Jídlo",q:"TOP 10 druhů hostů na večeři co jsou noční můrou každého kuchaře"},
+{c:"Jídlo",q:"TOP 10 věcí, které říkáš v restauraci a pak toho lituju"},
+{c:"Jídlo",q:"TOP 10 situací kdy člověk jí špatně i když 'začal zdravě žít'"},
+{c:"Jídlo",q:"TOP 10 pokrmů, které mají jiný název v menu a v realitě"},
+{c:"Jídlo",q:"TOP 10 pocitů při placení účtu ve skupině lidí"},
+{c:"Jídlo",q:"TOP 10 ingrediencí, které přidáš k receptu a vždy to dopadne špatně"},
+{c:"Jídlo",q:"TOP 10 způsobů jak burgery na fotkách v reklamě nikdy nevypadají jako ve skutečnosti"},
+{c:"Jídlo",q:"TOP 10 věcí co jsou absolutní povinnost v lednici každého Čecha"},
+{c:"Jídlo",q:"TOP 10 způsobů jak poznat že jídlo v restauraci je zmražené ne čerstvé"},
+{c:"Jídlo",q:"TOP 10 věcí co se stane na každé první večeři s partnerovými rodiči"},
+{c:"Jídlo",q:"TOP 10 způsobů jak jíst zdravě skončí za týden"},
+{c:"Jídlo",q:"TOP 10 věcí co říkají lidi co vaří 'podle pocitu' a nikdy to nefunguje ostatním"},
+{c:"Jídlo",q:"TOP 10 jídel co jsou záchrana při kocovině seřazená podle účinnosti"},
+{c:"Jídlo",q:"TOP 10 způsobů jak food delivery změní tvůj vztah k vaření"},
+{c:"Jídlo",q:"TOP 10 věcí co jsou na rodinné receptu 'tajemství' ale jsou to jen normální věci"},
+{c:"Jídlo",q:"TOP 10 způsobů jak 'výběr z menu' v levné restauraci je iluze"},
+{c:"Jídlo",q:"TOP 10 pokrmů které jsou lepší druhý den a proč tomu tak je"},
+{c:"Jídlo",q:"TOP 10 věcí co jsou na moderním fine dining absurdní"},
+{c:"Jídlo",q:"TOP 10 způsobů jak chilli papričky lidi přeceňují svou toleranci"},
+{c:"Jídlo",q:"TOP 10 pravidel etikety u stolu co jsou v různých kulturách přesně obráceně"},
+{c:"Jídlo",q:"TOP 10 věcí co nikdo neví o tom jak fungují Michelin hvězdy"},
+{c:"Jídlo",q:"TOP 10 způsobů jak 'domácí vaření' se liší od toho co si pod tím představuješ"},
+{c:"Jídlo",q:"TOP 10 věcí co ukazují že italský turist v české restauraci bude zklamaný"},
+// ── SPORT & FITNESS ──────────────────────────────
+{c:"Sport",q:"TOP 10 výmluv proč nejít do fitka i když máš předplacené"},
+{c:"Sport",q:"TOP 10 typů lidí v šatně posilovny seřazeni od sympatičtí po ne"},
+{c:"Sport",q:"TOP 10 věcí, které říkáš před zahájením fitness journey a splníš jen 2"},
+{c:"Sport",q:"TOP 10 zranění která sis přivodil tím že jsi sportoval jak 20-letý ale je ti 35"},
+{c:"Sport",q:"TOP 10 způsobů jak lidi předstírají že cvičí ale vlastně ne"},
+{c:"Sport",q:"TOP 10 věcí co zažijete když jdete poprvé na skupinové cvičení"},
+{c:"Sport",q:"TOP 10 věcí, které ti říká trenér a chtěl bys mu říct zpátky"},
+{c:"Sport",q:"TOP 10 důvodů proč jsou fanoušci fotbalu iracionální a sami to vědí"},
+{c:"Sport",q:"TOP 10 pocitů den po prvním tréninku po dlouhé pauze"},
+{c:"Sport",q:"TOP 10 aplikací na sport které si stáhneš a po týdnu smažeš"},
+{c:"Sport",q:"TOP 10 věcí co se stane na maratonu co pořadatelé neplánovali"},
+{c:"Sport",q:"TOP 10 sportů kde vypadat profesionálně je důležitější než výkon"},
+{c:"Sport",q:"TOP 10 důvodů proč lidé kupují drahé sportovní vybavení místo aby sportovali"},
+{c:"Sport",q:"TOP 10 chyb, které dělá každý začátečník v posilovně"},
+{c:"Sport",q:"TOP 10 způsobů jak víkendový sportovec přeceňuje svou kondici"},
+{c:"Sport",q:"TOP 10 věcí co jsou na sledování sportu v hospodě naprosto rituální"},
+{c:"Sport",q:"TOP 10 způsobů jak fitness influencer tě přesvědčí koupit věc co nepotřebuješ"},
+{c:"Sport",q:"TOP 10 věcí co každý říká po prvním tréninku jógy"},
+{c:"Sport",q:"TOP 10 způsobů jak sport změní charakter člověka pozitivně i negativně"},
+{c:"Sport",q:"TOP 10 věcí co jsou na golfistovi záhadné pro ostatní lidi"},
+{c:"Sport",q:"TOP 10 způsobů jak running změní osobnost člověka"},
+{c:"Sport",q:"TOP 10 věcí co lidi říkají po skončení triatlonu co jsou přehnaně dramatické"},
+{c:"Sport",q:"TOP 10 důvodů proč jsou výsledky sportovních sázkování vždy špatné"},
+{c:"Sport",q:"TOP 10 věcí co se stane při prvním zimním koupání"},
+{c:"Sport",q:"TOP 10 způsobů jak posilovna v lednu je jiná než posilovna v březnu"},
+{c:"Sport",q:"TOP 10 věcí co každý vyznavač crossfitu zmíní do 5 minut rozhovoru"},
+{c:"Sport",q:"TOP 10 způsobů jak cyklistika rozděluje lidi na dva tábory"},
+{c:"Sport",q:"TOP 10 věcí co jsou na olympijských hrách záhadné pro průměrného diváka"},
+{c:"Sport",q:"TOP 10 způsobů jak dětský sport ovlivní rodiče víc než samotné dítě"},
+{c:"Sport",q:"TOP 10 věcí co každý plavec zažil v bazénu co by radši nezažil"},
+// ── CESTOVÁNÍ ────────────────────────────────────
+{c:"Cestování",q:"TOP 10 věcí, které zabalíš na dovolenou a nevyndáš ani jednou"},
+{c:"Cestování",q:"TOP 10 typů cestujících v letadle seřazené podle obtěžování ostatních"},
+{c:"Cestování",q:"TOP 10 věcí, co říkáš před cestou 'tentokrát to bude jiné' a není"},
+{c:"Cestování",q:"TOP 10 situací na letišti, které tě dovedou k šílenství"},
+{c:"Cestování",q:"TOP 10 hotelových zkušeností, které nezpůsobily reklamaci ale měly"},
+{c:"Cestování",q:"TOP 10 důvodů proč je 'all-inclusive' ve skutečnosti past"},
+{c:"Cestování",q:"TOP 10 věcí, co si turisté fotí co je pro místní naprosto normální"},
+{c:"Cestování",q:"TOP 10 způsobů jak poznat že hotel na Booking.com byl nafocen před 15 lety"},
+{c:"Cestování",q:"TOP 10 věcí, co nám v cizí zemi dojde až po příletu že jsme neměli dělat"},
+{c:"Cestování",q:"TOP 10 situací kdy cestování s kamarádem je test přátelství"},
+{c:"Cestování",q:"TOP 10 zážitků z dovolené, které vypadají skvěle na Instagramu ale byly utrpení"},
+{c:"Cestování",q:"TOP 10 věcí co lidé dělají na dovolené a pak říkají 'to bylo zbytečné'"},
+{c:"Cestování",q:"TOP 10 okamžiků kdy si řekneš 'příště jedu sám'"},
+{c:"Cestování",q:"TOP 10 způsobů jak AirBnB zklame i když má 4.9 hvězdiček"},
+{c:"Cestování",q:"TOP 10 věcí co jsou na levných aerolinkách absurdní"},
+{c:"Cestování",q:"TOP 10 způsobů jak si cestovatelé namlouvají že 'cestování je životní styl'"},
+{c:"Cestování",q:"TOP 10 věcí co jsou absolutně nezbytné na backpackerské cestě a zapomeneš je"},
+{c:"Cestování",q:"TOP 10 způsobů jak turistická past vypadá nevinně ale není"},
+{c:"Cestování",q:"TOP 10 věcí co se změní v tvém pohledu na Česko poté co jsi byl v zahraničí"},
+{c:"Cestování",q:"TOP 10 způsobů jak místní poznají turistu dřív než otevře ústa"},
+{c:"Cestování",q:"TOP 10 věcí co jsou na výletní lodi absurdní"},
+{c:"Cestování",q:"TOP 10 způsobů jak jet autobusem přes celou Evropu změní člověka"},
+{c:"Cestování",q:"TOP 10 věcí co každý řekne po návratu z Asie"},
+{c:"Cestování",q:"TOP 10 způsobů jak dovolená s dětmi je diametrálně jiná než bez dětí"},
+{c:"Cestování",q:"TOP 10 věcí co jsou na americkém turismu záhadné pro Evropany"},
+{c:"Cestování",q:"TOP 10 způsobů jak language barrier změní chování lidí k horšímu"},
+{c:"Cestování",q:"TOP 10 věcí co si turisté v Praze myslí o Praze co není pravda"},
+{c:"Cestování",q:"TOP 10 způsobů jak cestovatelský blog zkresluje realitu destinace"},
+{c:"Cestování",q:"TOP 10 věcí co každý zažije při prvním sólo cestování"},
+{c:"Cestování",q:"TOP 10 způsobů jak si jet na dovolenou sám je lepší než říkají ostatní"},
+// ── RODINA & DĚTI ────────────────────────────────
+{c:"Rodina",q:"TOP 10 věcí, které rodiče říkají co tě jako dítě štvalo ale teď chápeš"},
+{c:"Rodina",q:"TOP 10 způsobů jak poznat že jsi dospělý opravdu až když..."},
+{c:"Rodina",q:"TOP 10 věcí, které se stane při rodinné večeři o svátcích"},
+{c:"Rodina",q:"TOP 10 taktik malých dětí jak dostat co chtějí"},
+{c:"Rodina",q:"TOP 10 věcí co říkáš rodičům telefonicky vs. co si ve skutečnosti myslíš"},
+{c:"Rodina",q:"TOP 10 otázek od příbuzných na Vánoce, které bys raději neslyšel"},
+{c:"Rodina",q:"TOP 10 způsobů jak sourozenec ví přesně jak tě vytočit"},
+{c:"Rodina",q:"TOP 10 věcí, co děti říkají dospělým co je nepříjemně pravdivé"},
+{c:"Rodina",q:"TOP 10 okamžiků, kdy si uvědomíš, že se měníš v rodiče"},
+{c:"Rodina",q:"TOP 10 věcí, co se musí stát aby rodinná party skončila brzy"},
+{c:"Rodina",q:"TOP 10 výmluv teenagerů proč nemohou jít na rodinnou akci"},
+{c:"Rodina",q:"TOP 10 dárků, které dostaneš od prarodičů co nevíš co s nimi"},
+{c:"Rodina",q:"TOP 10 věcí, které si slíbíš když budeš mít děti a pak neuděláš"},
+{c:"Rodina",q:"TOP 10 věcí, které babička říká pravidelně bez ohledu na situaci"},
+{c:"Rodina",q:"TOP 10 způsobů jak rodiče nevědomky špiónují dospělé děti"},
+{c:"Rodina",q:"TOP 10 věcí co jsou na rodičovství těžší než kdokoli říkal"},
+{c:"Rodina",q:"TOP 10 způsobů jak první dítě a druhé dítě jsou vychovávány naprosto jinak"},
+{c:"Rodina",q:"TOP 10 věcí co jsou na skupině rodičů ve WhatsApp absolutně otravné"},
+{c:"Rodina",q:"TOP 10 způsobů jak děti zruinují každou romantickou chvíli"},
+{c:"Rodina",q:"TOP 10 věcí co každý rodič řekne a pak se diví proč to dítě opakuje"},
+{c:"Rodina",q:"TOP 10 způsobů jak tchán nebo tchýně změní dynamiku vztahu"},
+{c:"Rodina",q:"TOP 10 věcí co jsou na školní schůzce absolutně předvídatelné"},
+{c:"Rodina",q:"TOP 10 způsobů jak sourozenecká rivalita trvá i v dospělosti"},
+{c:"Rodina",q:"TOP 10 věcí co rodiče nikdy nepochopí o digitálním světě jejich dětí"},
+{c:"Rodina",q:"TOP 10 způsobů jak rodinná tradice je vnímána různě různými generacemi"},
+{c:"Rodina",q:"TOP 10 věcí co jsou na prvním babysittingu traumatizující"},
+{c:"Rodina",q:"TOP 10 způsobů jak máma komunikuje přes telefon čistě neverbálně"},
+{c:"Rodina",q:"TOP 10 věcí co každý zažije při prvním vlastním bytě po odchodu od rodičů"},
+{c:"Rodina",q:"TOP 10 způsobů jak rodinná dovolená s dětmi je test manželství"},
+{c:"Rodina",q:"TOP 10 věcí co jsou na Vánocích v rodině absolutně neměnné rituály"},
+// ── PENÍZE & NAKUPOVÁNÍ ──────────────────────────
+{c:"Peníze",q:"TOP 10 věcí, které si koupíš ve výprodeji a nikdy nepoužiješ"},
+{c:"Peníze",q:"TOP 10 způsobů jak se 'rozumné šetření' změní v záchvat nakupování"},
+{c:"Peníze",q:"TOP 10 výmluv proč je tento nákup vlastně investice"},
+{c:"Peníze",q:"TOP 10 pocitů při pohledu na výpis z bankovního účtu v pondělí ráno"},
+{c:"Peníze",q:"TOP 10 předplatných, která platíš a nepoužíváš"},
+{c:"Peníze",q:"TOP 10 způsobů jak výprodej Black Friday způsobí více výdajů než úspor"},
+{c:"Peníze",q:"TOP 10 věcí, které kupuješ 'pro zdraví' ale jsou jen drahé"},
+{c:"Peníze",q:"TOP 10 okamžiků kdy zrealizuješ kolik peněz jsi minulý měsíc utratil za blbosti"},
+{c:"Peníze",q:"TOP 10 věcí, na které lidi vydají víc peněz než přiznají"},
+{c:"Peníze",q:"TOP 10 způsobů jak lidé předstírají že jsou finančně gram ale nejsou"},
+{c:"Peníze",q:"TOP 10 věcí, které jsou 'zadarmo' ale ve skutečnosti tě stojí hodně"},
+{c:"Peníze",q:"TOP 10 způsobů jak ceny v restauracích jsou naprosto libovolné"},
+{c:"Peníze",q:"TOP 10 věcí co jsou na kryptoměnách záhadné pro normální lidi"},
+{c:"Peníze",q:"TOP 10 způsobů jak influencer marketing tě přiměje koupit věc co nepotřebuješ"},
+{c:"Peníze",q:"TOP 10 věcí co ukazují že nemáš finanční gramotnost ale myslíš že máš"},
+{c:"Peníze",q:"TOP 10 způsobů jak restaurace tě přimějí utrácet víc než jsi plánoval"},
+{c:"Peníze",q:"TOP 10 věcí co jsou na hypotéce záhadné dokud ji nemáš"},
+{c:"Peníze",q:"TOP 10 způsobů jak výplata zmizí i když jsi 'tentokrát šetřil'"},
+{c:"Peníze",q:"TOP 10 věcí co každý kupuje na eBay nebo vinted co pak lituje"},
+{c:"Peníze",q:"TOP 10 způsobů jak slevové kupóny způsobí víc výdajů"},
+{c:"Peníze",q:"TOP 10 věcí co jsou absolutní plýtvání penězi ale děláme to všichni"},
+{c:"Peníze",q:"TOP 10 způsobů jak bohatí lidé myslí o penězích jinak než průměrný člověk"},
+{c:"Peníze",q:"TOP 10 věcí co jsou na předraženém kávovém řetězci iracionálně přitažlivé"},
+{c:"Peníze",q:"TOP 10 způsobů jak dávat spropitné je různé v různých zemích a proč to mate"},
+{c:"Peníze",q:"TOP 10 věcí co jsou na moderním bankovnictví špatně designované"},
+{c:"Peníze",q:"TOP 10 způsobů jak peníze mění vztahy mezi přáteli"},
+{c:"Peníze",q:"TOP 10 věcí co jsou na správném rozpočtu těžší než teorie říká"},
+{c:"Peníze",q:"TOP 10 způsobů jak nákup bytu změní člověka navždy"},
+{c:"Peníze",q:"TOP 10 věcí co by měl každý vědět o penězích a nikdo ho to nenaučil"},
+{c:"Peníze",q:"TOP 10 způsobů jak loterie funguje jako dobrovolná daň"},
+// ── ZDRAVÍ & NEMOCI ──────────────────────────────
+{c:"Zdraví",q:"TOP 10 symptomů, které si načteš na Googlu a skončíš diagnózou 'rakovina'"},
+{c:"Zdraví",q:"TOP 10 věcí, které řekneš lékaři místo toho co ti skutečně vadí"},
+{c:"Zdraví",q:"TOP 10 způsobů jak se samoléčíš místo toho abys šel k doktorovi"},
+{c:"Zdraví",q:"TOP 10 výmluv proč nezačít zdravě žít 'hned'"},
+{c:"Zdraví",q:"TOP 10 věcí, které lidé dělají 'pro zdraví' a jsou to nesmysly"},
+{c:"Zdraví",q:"TOP 10 způsobů jak chřipka způsobuje dramatičtější chování u mužů"},
+{c:"Zdraví",q:"TOP 10 věcí, co říkají influenceři o zdraví a jsou čistý nesmysl"},
+{c:"Zdraví",q:"TOP 10 příznaků, které ignoruješ protože 'to samo přejde'"},
+{c:"Zdraví",q:"TOP 10 věcí, které děláš pozdě večer co víš, že zítra budou problém"},
+{c:"Zdraví",q:"TOP 10 diet, které jsi zkusil a u každé skončil"},
+{c:"Zdraví",q:"TOP 10 věcí, které přestaneš dělat v pondělí ráno a do pátku zapomeneš"},
+{c:"Zdraví",q:"TOP 10 způsobů jak spánek je podceňovaný dokud si ho nezkazíš"},
+{c:"Zdraví",q:"TOP 10 věcí co jsou na moderní medicíně pro pacienta matoucí"},
+{c:"Zdraví",q:"TOP 10 způsobů jak stres se projevuje fyzicky aniž bys věděl proč"},
+{c:"Zdraví",q:"TOP 10 věcí co říkají zubaři co tě vystraší víc než samotné ošetření"},
+{c:"Zdraví",q:"TOP 10 způsobů jak lidé používají 'jsem unavený' místo popisu skutečného stavu"},
+{c:"Zdraví",q:"TOP 10 věcí co jsou na čekárně u lékaře absolutně depresivní"},
+{c:"Zdraví",q:"TOP 10 způsobů jak moderní životní styl způsobuje problémy co dřív neexistovaly"},
+{c:"Zdraví",q:"TOP 10 věcí co jsou na zdravém spánkovém režimu těžší než zní"},
+{c:"Zdraví",q:"TOP 10 způsobů jak alkohol nahrazuje různé emocionální potřeby"},
+{c:"Zdraví",q:"TOP 10 věcí co jsou na moderní psychoterapii záhadné pro lidi co ji nezkoušeli"},
+{c:"Zdraví",q:"TOP 10 způsobů jak meditace změní člověka nebo ho totálně nebaví"},
+{c:"Zdraví",q:"TOP 10 věcí co jsou na biohackerech a jejich routinách absurdní"},
+{c:"Zdraví",q:"TOP 10 způsobů jak zdravotní pojišťovny komunikují co je záhadné"},
+{c:"Zdraví",q:"TOP 10 věcí co každý zažil při první návštěvě psychologa"},
+{c:"Zdraví",q:"TOP 10 způsobů jak burnout přichází postupně aniž bys to zpozoroval"},
+{c:"Zdraví",q:"TOP 10 věcí co jsou na keto dietě naprosto iracionálně přeceňované"},
+{c:"Zdraví",q:"TOP 10 způsobů jak noční směna změní biologické hodiny navždy"},
+{c:"Zdraví",q:"TOP 10 věcí co každý ví že je nezdravé ale dělá to stejně"},
+{c:"Zdraví",q:"TOP 10 způsobů jak placebo efekt funguje v každodenním životě"},
+// ── ALKOHOL & PÁRTY ──────────────────────────────
+{c:"Párty",q:"TOP 10 myšlenek při 4. drinku co zněly jako výborný nápad"},
+{c:"Párty",q:"TOP 10 věcí, které si zapamatuješ z večírku a přeješ si aby ses zapomněl"},
+{c:"Párty",q:"TOP 10 způsobů jak exit z párty vždy selže když chceš jít brzy domů"},
+{c:"Párty",q:"TOP 10 typů opilých lidí — ten co je přátelský se vším, ten co brečí..."},
+{c:"Párty",q:"TOP 10 věcí co říkáš ráno 'tohle jsem říkat neměl'"},
+{c:"Párty",q:"TOP 10 slibů co dáš sobě po krutém ránu po párty"},
+{c:"Párty",q:"TOP 10 způsobů jak se 'jdeme na jedno' změní v 3 ráno"},
+{c:"Párty",q:"TOP 10 věcí, které najdeš ve svém telefonu ráno po párty"},
+{c:"Párty",q:"TOP 10 způsobů jak host zničí party co nikdo nepozval"},
+{c:"Párty",q:"TOP 10 věcí co jsou zase skvělé až po kocovině"},
+{c:"Párty",q:"TOP 10 vět, které říká člověk 'co nepije' na párty"},
+{c:"Párty",q:"TOP 10 způsobů jak dárková lahev vína zmizí ještě před večeří"},
+{c:"Párty",q:"TOP 10 věcí, které se odehrají 'venku před barem' co bys raději neviděl"},
+{c:"Párty",q:"TOP 10 způsobů jak kamarád sabotuje tvůj plán jít spát ve 22:00"},
+{c:"Párty",q:"TOP 10 věcí co každý DJ hraje na svatbě povinně"},
+{c:"Párty",q:"TOP 10 způsobů jak hudba na párty říká více o hostiteli než cokoli jiného"},
+{c:"Párty",q:"TOP 10 věcí co jsou na firemním vánočním večírku absolutně trapné"},
+{c:"Párty",q:"TOP 10 způsobů jak rozeznáš typ párty ještě před vstupem"},
+{c:"Párty",q:"TOP 10 věcí co jsou na 'pivní zahrada' kultuře v létě absolutně rituální"},
+{c:"Párty",q:"TOP 10 způsobů jak narozeninová párty pro 30. narozeniny je existenciální"},
+{c:"Párty",q:"TOP 10 věcí co každý říká na rozlučce se svobodou a nikdo si nepamatuje"},
+{c:"Párty",q:"TOP 10 způsobů jak afterparty je vždy chybou i když to takhle nevypadá"},
+{c:"Párty",q:"TOP 10 věcí co jsou na moderní cocktail kultuře přepjaté"},
+{c:"Párty",q:"TOP 10 způsobů jak hostit párty doma se změní v noční můru"},
+{c:"Párty",q:"TOP 10 věcí co každý host udělá na páry doma co hostitele štve"},
+{c:"Párty",q:"TOP 10 způsobů jak festival změní člověka za 3 dny"},
+{c:"Párty",q:"TOP 10 věcí co jsou na festivalovém kempu absolutně nepříjemné"},
+{c:"Párty",q:"TOP 10 způsobů jak narozeninová oslava pro dítě je horší pro rodiče než pro dítě"},
+{c:"Párty",q:"TOP 10 věcí co jsou na moderní 'instagramovatelné' párty iracionální"},
+{c:"Párty",q:"TOP 10 způsobů jak rozeznat zda je párty dobrá nebo špatná do 15 minut"},
+// ── KULTURA & ZÁLIBY ─────────────────────────────
+{c:"Kultura",q:"TOP 10 způsobů jak poznat že film bude špatný ještě před první scénou"},
+{c:"Kultura",q:"TOP 10 typů diváků v kině — ten co komentuje, ten co chrupe..."},
+{c:"Kultura",q:"TOP 10 knih, které máš na poličce a nikdy sis je nepřečetl"},
+{c:"Kultura",q:"TOP 10 věcí, které říkáš o hudbě co jsi nikdy neposlouchal"},
+{c:"Kultura",q:"TOP 10 způsobů jak se 'seriálová noc' promění v 5 ráno"},
+{c:"Kultura",q:"TOP 10 věcí, co se posloucháš v podcastu a pak nikde neuplatníš"},
+{c:"Kultura",q:"TOP 10 způsobů jak si lidi tvoří identitu ze svého hudebního vkusu"},
+{c:"Kultura",q:"TOP 10 věcí, co řekneš v galerii moderního umění aniž bys čemukoli rozuměl"},
+{c:"Kultura",q:"TOP 10 způsobů jak hudba 'z tvojí éry' zní jinak teď než tehdy"},
+{c:"Kultura",q:"TOP 10 věcí co jsou na Netflixu dokumentárním žánru záhadné"},
+{c:"Kultura",q:"TOP 10 způsobů jak kino zažívá krizi a přesto lidi chodí"},
+{c:"Kultura",q:"TOP 10 věcí co každý přizná o svém guilty pleasure seriálu"},
+{c:"Kultura",q:"TOP 10 způsobů jak knihkupectví je jiný zážitek než Amazon"},
+{c:"Kultura",q:"TOP 10 věcí co jsou na moderní pop hudbě strukturálně stejné"},
+{c:"Kultura",q:"TOP 10 způsobů jak filmové pokračování pokazí originál"},
+{c:"Kultura",q:"TOP 10 věcí co jsou na stand-up komedii záhadné pro lidi co ho nesledují"},
+{c:"Kultura",q:"TOP 10 způsobů jak divadlo je vnímáno jako elitní i když není"},
+{c:"Kultura",q:"TOP 10 věcí co jsou na výstavě fotografie naprosto předvídatelné"},
+{c:"Kultura",q:"TOP 10 způsobů jak TikTok změnil hudební průmysl"},
+{c:"Kultura",q:"TOP 10 věcí co každý kulturní snobi říká co je nesnesitelné"},
+{c:"Kultura",q:"TOP 10 způsobů jak podcast kultura mění způsob jak přemýšlíme"},
+{c:"Kultura",q:"TOP 10 věcí co jsou na remakovém boom v Hollywoodu symptomatické"},
+{c:"Kultura",q:"TOP 10 způsobů jak Spotify wrapped odhalí o tobě víc než chceš"},
+{c:"Kultura",q:"TOP 10 věcí co jsou na moderní knihovně záhadné pro mileniály"},
+{c:"Kultura",q:"TOP 10 způsobů jak herní průmysl předběhl filmový"},
+{c:"Kultura",q:"TOP 10 věcí co každý fanoušek Harryho Pottera zažil"},
+{c:"Kultura",q:"TOP 10 způsobů jak komiksy a manga jsou vnímány různými generacemi"},
+{c:"Kultura",q:"TOP 10 věcí co jsou na 'virálním' obsahu záhadné co se šíří"},
+{c:"Kultura",q:"TOP 10 způsobů jak anime fanoušci jsou vnímáni ostatními"},
+{c:"Kultura",q:"TOP 10 věcí co jsou na moderní reklamě psychologicky manipulativní"},
+// ── ŠKOLA & STUDIUM ──────────────────────────────
+{c:"Škola",q:"TOP 10 způsobů jak prokrastinovat úkol co je na zítra"},
+{c:"Škola",q:"TOP 10 věcí, které učitel říká a které mají skrytý podtext"},
+{c:"Škola",q:"TOP 10 typů spolužáků při skupinovém projektu"},
+{c:"Škola",q:"TOP 10 způsobů jak se příprava na zkoušku změní v úklid bytu"},
+{c:"Škola",q:"TOP 10 věcí, které jsi se naučil ve škole a v životě nikdy nepoužil"},
+{c:"Škola",q:"TOP 10 způsobů jak studenti předstírají že učitelé neví o opisování"},
+{c:"Škola",q:"TOP 10 věcí, co studenti říkají 24 hodin před zkouškou"},
+{c:"Škola",q:"TOP 10 ospravedlnění pro odevzdání pozdě"},
+{c:"Škola",q:"TOP 10 věcí, které zpětně víš, že jsi se ve škole měl naučit ale neučil"},
+{c:"Škola",q:"TOP 10 lekcí, které tě o životě víc naučil spolužák než učebnice"},
+{c:"Škola",q:"TOP 10 způsobů jak maturitní večírek nikdy není tak dobrý jak se plánovalo"},
+{c:"Škola",q:"TOP 10 věcí co jsou na vysoké škole naprosto jiné od střední"},
+{c:"Škola",q:"TOP 10 způsobů jak diplomová práce změní člověka k horšímu"},
+{c:"Škola",q:"TOP 10 věcí co jsou na sezení ve třídě v posledních lavicích taktické"},
+{c:"Škola",q:"TOP 10 způsobů jak školní výlet je jiný pro učitele a pro studenty"},
+{c:"Škola",q:"TOP 10 věcí co jsou na moderním vzdělávacím systému záhadné"},
+{c:"Škola",q:"TOP 10 způsobů jak ChatGPT změnil studentský život navždy"},
+{c:"Škola",q:"TOP 10 věcí co jsou na třídním srazu naprosto předvídatelné"},
+{c:"Škola",q:"TOP 10 způsobů jak oblíbený učitel změní životní směřování"},
+{c:"Škola",q:"TOP 10 věcí co jsou na rodičovské schůzce záhadné pro bezdětné"},
+{c:"Škola",q:"TOP 10 způsobů jak student vysoké školy přesvědčí sám sebe že to stihne"},
+{c:"Škola",q:"TOP 10 věcí co jsou na stipendijním systému absurdní"},
+{c:"Škola",q:"TOP 10 způsobů jak přednáška s 200 lidmi je pro profesora i studenty jiná"},
+{c:"Škola",q:"TOP 10 věcí co každý absolvent zjistí v prvním zaměstnání co ho nikdo nenaučil"},
+{c:"Škola",q:"TOP 10 způsobů jak volba oboru na VŠ je náhoda maskovaná jako rozhodnutí"},
+{c:"Škola",q:"TOP 10 věcí co jsou na zkouškovém období absolutně rituální"},
+{c:"Škola",q:"TOP 10 způsobů jak prázdniny se zkrátí vždy o 2 týdny než ses stihl nudit"},
+{c:"Škola",q:"TOP 10 věcí co jsou na moderním domácím vzdělávání záhadné"},
+{c:"Škola",q:"TOP 10 způsobů jak první den ve škole je stejně traumatizující v 6 i v 16"},
+{c:"Škola",q:"TOP 10 věcí co jsou na vzdělávacích aplikacích přeceňované"},
+// ── PŘÍRODA & ZVÍŘATA ────────────────────────────
+{c:"Zvířata",q:"TOP 10 způsobů jak kočka vyjadřuje pohrdání svým majitelem"},
+{c:"Zvířata",q:"TOP 10 věcí, které tvůj pes dělá co nevíš jak vysvětlit návštěvě"},
+{c:"Zvířata",q:"TOP 10 způsobů jak majitelé psů se mění po pořízení psa"},
+{c:"Zvířata",q:"TOP 10 věcí co jsou pro majitele koček normální a pro zbytek světa bizarní"},
+{c:"Zvířata",q:"TOP 10 způsobů jak komár vybírá svou oběť — cílená teorie"},
+{c:"Zvířata",q:"TOP 10 věcí, co si zvíře v ZOO zřejmě myslí o návštěvnících"},
+{c:"Zvířata",q:"TOP 10 věcí co říkáš svému mazlíčkovi co by tě v jiném kontextu zavřeli"},
+{c:"Zvířata",q:"TOP 10 způsobů jak domácí mazlíček zruinuje tvůj nábytek ale stejně mu odpustíš"},
+{c:"Zvířata",q:"TOP 10 věcí co jsou na pavouku ve sklenici dramatičtější než by mělo být"},
+{c:"Zvířata",q:"TOP 10 způsobů jak majitelé psů nedodržují pravidla v parku"},
+{c:"Zvířata",q:"TOP 10 věcí, které by zvíře v domácnosti změnilo kdyby mohlo mluvit"},
+{c:"Zvířata",q:"TOP 10 důvodů proč si lidé pořídí exotické zvíře a pak z toho mají hrůzu"},
+{c:"Zvířata",q:"TOP 10 způsobů jak kočka komunikuje svou nespokojenost"},
+{c:"Zvířata",q:"TOP 10 věcí co jsou na veterinární návštěvě absolutně předvídatelné"},
+{c:"Zvířata",q:"TOP 10 způsobů jak zlatý retriever je jiný druh inteligence"},
+{c:"Zvířata",q:"TOP 10 věcí co každý chovatel králíků musí vysvětlovat ne-chovatelům"},
+{c:"Zvířata",q:"TOP 10 způsobů jak pes pozná kdy jdeš ven ještě před tím než ty víš"},
+{c:"Zvířata",q:"TOP 10 věcí co jsou na ptácích jako mazlíčcích záhadné"},
+{c:"Zvířata",q:"TOP 10 způsobů jak kočky a psi žijí ve stejné domácnosti — věčná studená válka"},
+{c:"Zvířata",q:"TOP 10 věcí co každý zažije při první návštěvě venkovního statku"},
+{c:"Zvířata",q:"TOP 10 způsobů jak zvířata reagují na bouřku a co to říká o jejich inteligenci"},
+{c:"Zvířata",q:"TOP 10 věcí co jsou na psích parkách sociálně záhadné"},
+{c:"Zvířata",q:"TOP 10 způsobů jak morče je absolutně podceňovaný mazlíček"},
+{c:"Zvířata",q:"TOP 10 věcí co si kočka dělá sama a nikdy nevíš proč"},
+{c:"Zvířata",q:"TOP 10 způsobů jak dostat kočku do přepravky je mezinárodní sport"},
+{c:"Zvířata",q:"TOP 10 věcí co jsou na moderním pet průmyslu absurdně předražené"},
+{c:"Zvířata",q:"TOP 10 způsobů jak pes změní rutinu rodiny nenávratně"},
+{c:"Zvířata",q:"TOP 10 věcí co každý chovatel hada musí snášet od okolí"},
+{c:"Zvířata",q:"TOP 10 způsobů jak ryby jako mazlíček jsou nedoceněné"},
+{c:"Zvířata",q:"TOP 10 věcí co jsou na sledování dokumentů o přírodě absolutně návykové"},
+// ── BYDLENÍ & DOMÁCNOST ──────────────────────────
+{c:"Bydlení",q:"TOP 10 způsobů jak soused ví přesně jak tě obtěžovat bez přestupku"},
+{c:"Bydlení",q:"TOP 10 věcí, které zanedbáváš v bytě dokud nepřijde návštěva"},
+{c:"Bydlení",q:"TOP 10 věcí, které si koupíš pro 'organizaci domácnosti' a skončí ve skříni"},
+{c:"Bydlení",q:"TOP 10 důvodů proč oprava v bytě trvá vždy 3x déle než plánováno"},
+{c:"Bydlení",q:"TOP 10 způsobů jak spotřebiče poznají kdy přestat fungovat"},
+{c:"Bydlení",q:"TOP 10 fází úklidu bytu — přerovnání věcí z jednoho místa na druhé"},
+{c:"Bydlení",q:"TOP 10 věcí co lidé kupují na IKEA a vracejí se domů s jiným"},
+{c:"Bydlení",q:"TOP 10 způsobů jak zjistit, zda je nový soused přijatelný"},
+{c:"Bydlení",q:"TOP 10 věcí, které uděláš v novém bytě hned a pak nikdy nepokračuješ"},
+{c:"Bydlení",q:"TOP 10 zvuků v domácnosti, které tě znepokojují ale ignoruješ je"},
+{c:"Bydlení",q:"TOP 10 způsobů jak 'jednoduchá' domácí renovace přeroste v noční můru"},
+{c:"Bydlení",q:"TOP 10 věcí, co sis půjčil od souseda a 'vrátíš to zítra'"},
+{c:"Bydlení",q:"TOP 10 důvodů proč je stěhování psychicky náročnější než vypadá"},
+{c:"Bydlení",q:"TOP 10 věcí co každý majitel bytu zažije s pronajímatelem"},
+{c:"Bydlení",q:"TOP 10 způsobů jak skříně v domácnosti jsou portálem do minulosti"},
+{c:"Bydlení",q:"TOP 10 věcí co jsou na sdíleném bydlení naprosto záhadné dokud to nezažiješ"},
+{c:"Bydlení",q:"TOP 10 způsobů jak rostliny v bytě odhalují charakter majitele"},
+{c:"Bydlení",q:"TOP 10 věcí co jsou na první vlastní hypotéce existenciální"},
+{c:"Bydlení",q:"TOP 10 způsobů jak bytová pravidla v paneláku jsou záhadná"},
+{c:"Bydlení",q:"TOP 10 věcí co jsou na moderní kuchyňské technice zbytečné funkce"},
+{c:"Bydlení",q:"TOP 10 způsobů jak poschodí ve výškovém domě ovlivní sociální status"},
+{c:"Bydlení",q:"TOP 10 věcí co jsou na garsonce romantické a co jsou na ní depresivní"},
+{c:"Bydlení",q:"TOP 10 způsobů jak dům na venkově versus byt v centru rozdělí přátele"},
+{c:"Bydlení",q:"TOP 10 věcí co každý zjistí o sousedech i když nechce"},
+{c:"Bydlení",q:"TOP 10 způsobů jak bytové schůze jsou mikrokosmos politiky"},
+{c:"Bydlení",q:"TOP 10 věcí co jsou na smart home technologiích frustrující"},
+{c:"Bydlení",q:"TOP 10 způsobů jak zahrada změní víkend navždy"},
+{c:"Bydlení",q:"TOP 10 věcí co jsou na malém bytě absolutní výzvy"},
+{c:"Bydlení",q:"TOP 10 způsobů jak garage sale odhalí co je opravdu odpad"},
+{c:"Bydlení",q:"TOP 10 věcí co jsou na minimalismu záhadné pro maximalisty a naopak"},
+// ── ČESKO & ČESKÁ DUŠE ───────────────────────────
+{c:"Česko",q:"TOP 10 věcí, které jsou v Česku normální a v zahraničí šokující"},
+{c:"Česko",q:"TOP 10 způsobů jak Češi komunikují nesouhlas bez použití slova 'ne'"},
+{c:"Česko",q:"TOP 10 věcí, co si Češi stěžují ale nikdy nezmění"},
+{c:"Česko",q:"TOP 10 situací kde typický Čech přehnaně minimalizuje svůj úspěch"},
+{c:"Česko",q:"TOP 10 komentářů pod zpravodajským článkem na iDnes"},
+{c:"Česko",q:"TOP 10 způsobů jak Čech odmítne pomoc protože 'to zvládne sám'"},
+{c:"Česko",q:"TOP 10 věcí, které jsou v Čechách rituál ale jinde v Evropě neexistují"},
+{c:"Česko",q:"TOP 10 situací kde česká skromnost přejde v sebedestrukci"},
+{c:"Česko",q:"TOP 10 věcí, které má 'správný Čech' mít na chatě"},
+{c:"Česko",q:"TOP 10 způsobů jak Češi závodí o to kdo na tom byl hůř"},
+{c:"Česko",q:"TOP 10 věcí, co jsou na české kultuře skvělé ale nikdy se tím nechlubíme"},
+{c:"Česko",q:"TOP 10 frází, které říkáme v Čechách automaticky aniž bychom je mysleli"},
+{c:"Česko",q:"TOP 10 věcí, co se stane na každém typicky českém grilu"},
+{c:"Česko",q:"TOP 10 způsobů jak počasí ovlivní náladu průměrného Čecha"},
+{c:"Česko",q:"TOP 10 věcí co jsou na českém humoru záhadné pro cizince"},
+{c:"Česko",q:"TOP 10 způsobů jak česká hospodská kultura je unikátní v Evropě"},
+{c:"Česko",q:"TOP 10 věcí co jsou na záhradkách a chalupách pro Čechy posvátné"},
+{c:"Česko",q:"TOP 10 způsobů jak Vánoce v Česku jsou naprosto jedinečné"},
+{c:"Česko",q:"TOP 10 věcí co každý Čech v zahraničí musí vysvětlovat"},
+{c:"Česko",q:"TOP 10 způsobů jak česká mentalita je jiná od slovenské"},
+{c:"Česko",q:"TOP 10 věcí co jsou na Brně naprosto jiné od Prahy"},
+{c:"Česko",q:"TOP 10 způsobů jak Praha je vnímána zbytkem Česka"},
+{c:"Česko",q:"TOP 10 věcí co jsou na českém školství záhadné pro cizince"},
+{c:"Česko",q:"TOP 10 způsobů jak Čech cestuje a jak ho to odliší od ostatních Evropanů"},
+{c:"Česko",q:"TOP 10 věcí co jsou na Silvestru v Česku absolutně rituální"},
+{c:"Česko",q:"TOP 10 způsobů jak česká politika je vnímána prostými lidmi"},
+{c:"Česko",q:"TOP 10 věcí co jsou na podnikání v Česku specifické"},
+{c:"Česko",q:"TOP 10 způsobů jak česká architektura panelákové éry ovlivnila mentalitu"},
+{c:"Česko",q:"TOP 10 věcí co jsou na MHD v Praze záhadné pro prvotimery"},
+{c:"Česko",q:"TOP 10 způsobů jak česká kuchyně je jiná od toho co si cizinci myslí"},
+// ── DOPRAVA & AUTA ───────────────────────────────
+{c:"Doprava",q:"TOP 10 typů řidičů na dálnici seřazeni od nejnebezpečnějších"},
+{c:"Doprava",q:"TOP 10 věcí, co každý dělá v autě co by nikdy nepřiznal"},
+{c:"Doprava",q:"TOP 10 situací v MHD, které otestují tvou trpělivost"},
+{c:"Doprava",q:"TOP 10 způsobů jak GPS navigace zničí tvou cestovatelskou intuici"},
+{c:"Doprava",q:"TOP 10 důvodů proč parkování v centru je jako hra psychologické války"},
+{c:"Doprava",q:"TOP 10 věcí co se stane při sdíleném autu s přítelem na dlouhé cestě"},
+{c:"Doprava",q:"TOP 10 typů cestujících v autobuse na dálkové lince"},
+{c:"Doprava",q:"TOP 10 věcí, co si myslíš o jiných řidičích a říkáš sám sobě"},
+{c:"Doprava",q:"TOP 10 situací kdy elektromobil způsobí více stresu než spalovák"},
+{c:"Doprava",q:"TOP 10 věcí, které říkáš jako spolujezdec co jsou pro řidiče záhadné"},
+{c:"Doprava",q:"TOP 10 argumentů mezi páry v autě co jsou ve skutečnosti o něčem jiném"},
+{c:"Doprava",q:"TOP 10 věcí co by měl každý řidič vědět a neví"},
+{c:"Doprava",q:"TOP 10 způsobů jak autoškola tě nepřipraví na reálný provoz"},
+{c:"Doprava",q:"TOP 10 věcí co jsou na tankovacích stanicích záhadně drahé"},
+{c:"Doprava",q:"TOP 10 způsobů jak taxikáři a Uber řidiči jsou záhadně různí"},
+{c:"Doprava",q:"TOP 10 věcí co každý zažije na přeplněném nádraží"},
+{c:"Doprava",q:"TOP 10 způsobů jak jízdní kolo v Praze je denní výzva přežití"},
+{c:"Doprava",q:"TOP 10 věcí co jsou na dálniční zácpě absolutně předvídatelné"},
+{c:"Doprava",q:"TOP 10 způsobů jak řidič dodávky je vnímán ostatními účastníky provozu"},
+{c:"Doprava",q:"TOP 10 věcí co jsou na sdílení koloběžek ve městě záhadně rizikové"},
+{c:"Doprava",q:"TOP 10 způsobů jak noční vlak je romantický nebo děsivý záleží na úhlu pohledu"},
+{c:"Doprava",q:"TOP 10 věcí co jsou na ranní MHD absolutně depresivní"},
+{c:"Doprava",q:"TOP 10 způsobů jak cyklisté a chodci sdílí prostor je věčný konflikt"},
+{c:"Doprava",q:"TOP 10 věcí co každý šofér autobusu musí denně snášet"},
+{c:"Doprava",q:"TOP 10 způsobů jak autonehoda změní vnímání vlastní smrtelnosti"},
+{c:"Doprava",q:"TOP 10 věcí co jsou na kupování ojetého auta záhadné"},
+{c:"Doprava",q:"TOP 10 způsobů jak STK zjistí problémy vždy ve špatný moment"},
+{c:"Doprava",q:"TOP 10 věcí co jsou na autodromech pro začátečníky"},
+{c:"Doprava",q:"TOP 10 způsobů jak auto opustí majitele vždy v nejhorší čas"},
+{c:"Doprava",q:"TOP 10 věcí co jsou na parkingových automatech záhadně frustrující"},
+// ── MODERNÍ ŽIVOT ────────────────────────────────
+{c:"Moderní život",q:"TOP 10 věcí, které jsi dělal bez telefonu před 15 lety a teď si to nedovedeš představit"},
+{c:"Moderní život",q:"TOP 10 způsobů jak 'work-life balance' je v praxi marketing"},
+{c:"Moderní život",q:"TOP 10 věcí, které říkáme o produktivitě a jsou čistý kult"},
+{c:"Moderní život",q:"TOP 10 výmluv proč odkládáme věci na 'až se uklidní situace'"},
+{c:"Moderní život",q:"TOP 10 způsobů jak social media skresli naše vnímání vlastního života"},
+{c:"Moderní život",q:"TOP 10 věcí, co považuješ za samozřejmé dokud je nemáš"},
+{c:"Moderní život",q:"TOP 10 způsobů jak 'minimalismus' se stal dalším způsobem utrácení"},
+{c:"Moderní život",q:"TOP 10 věcí, které moderní člověk neumí bez aplikace"},
+{c:"Moderní život",q:"TOP 10 způsobů jak 'self-care' se stal povinností co přidává stres"},
+{c:"Moderní život",q:"TOP 10 věcí, které jsou dnes luxus a před 20 lety byly standard"},
+{c:"Moderní život",q:"TOP 10 způsobů jak 'být autentický' na Instagramu je protimluv"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na 'hustle culture' záhadně přitažlivé i ničivé"},
+{c:"Moderní život",q:"TOP 10 způsobů jak generace Z a mileniálové se vzájemně nechápou"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na moderní samotě jiné od historické samoty"},
+{c:"Moderní život",q:"TOP 10 způsobů jak FOMO ovlivňuje každodenní rozhodování"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na slow living trendech záhadně drahé"},
+{c:"Moderní život",q:"TOP 10 způsobů jak moderní člověk bojuje s nudou a prohrává"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na 'digital detox' záhadně populární ale nefunkční"},
+{c:"Moderní život",q:"TOP 10 způsobů jak online komunity nahrazují reálné vztahy"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na moderním sousedství záhadně odcizené"},
+{c:"Moderní život",q:"TOP 10 způsobů jak 30-tá léta jsou jiná než si lidi v 20 představovali"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na moderní životní krizi typické"},
+{c:"Moderní život",q:"TOP 10 způsobů jak lidé hledají smysl a co to říká o době"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na moderním randění jiné než před 20 lety"},
+{c:"Moderní život",q:"TOP 10 způsobů jak influencer kultura mění aspirace mladých lidí"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na home office po pandemii stále jiné"},
+{c:"Moderní život",q:"TOP 10 způsobů jak moderní člověk ztratil schopnost nudit se"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na environmentálním vědomí záhadně komplikované"},
+{c:"Moderní život",q:"TOP 10 způsobů jak šance na vlastní bydlení mění životní styl generace"},
+{c:"Moderní život",q:"TOP 10 věcí co jsou na moderní samozvanosti záhadně epidemické"},
+// ── HORY & LYŽOVÁNÍ ──────────────────────────────
+{c:"Hory",q:"TOP 10 výmluv proč nejít ráno na svah i když jedeš kvůli lyžím"},
+{c:"Hory",q:"TOP 10 myšlenek na sedačkovém vleku v mínusových teplotách"},
+{c:"Hory",q:"TOP 10 způsobů jak poznat úplného začátečníka na sjezdovce"},
+{c:"Hory",q:"TOP 10 věcí, které slyšíš v après-ski baru každý večer"},
+{c:"Hory",q:"TOP 10 věcí co se pokazí na horské chatě vždy bez výjimky"},
+{c:"Hory",q:"TOP 10 hlášek, které padnou při lyžování ve skupině přátel"},
+{c:"Hory",q:"TOP 10 dramatických situací na sjezdovce hodnocených intenzitou paniky"},
+{c:"Hory",q:"TOP 10 věcí, co si slíbíš zabalit příště a nikdy je nezabalíš"},
+{c:"Hory",q:"TOP 10 výmluv proč lyžařský výlet selhal ještě před odjezdem"},
+{c:"Hory",q:"TOP 10 pokrmů, které jíš na horách i když je doma nikdy nejíš"},
+{c:"Hory",q:"TOP 10 věcí co dělá snowboardista co lyžaře irituje a naopak"},
+{c:"Hory",q:"TOP 10 způsobů jak zjistíš, že to byla špatná sjezdovka než se dostaneš dolů"},
+{c:"Hory",q:"TOP 10 věcí, které instruktor lyžování neřekne ale myslí si je"},
+{c:"Hory",q:"TOP 10 věcí, které lyžař zaplatí v půjčovně zbytečně navíc"},
+{c:"Hory",q:"TOP 10 způsobů jak lyžařský výlet otestuje pevnost přátelství"},
+{c:"Hory",q:"TOP 10 věcí co jsou na lyžování s dětmi záhadně náročné"},
+{c:"Hory",q:"TOP 10 způsobů jak skipas motivuje jít lyžovat i když je špatné počasí"},
+{c:"Hory",q:"TOP 10 věcí co jsou na moderních lyžích záhadně drahé"},
+{c:"Hory",q:"TOP 10 způsobů jak après-ski kultura je v každé zemi jiná"},
+{c:"Hory",q:"TOP 10 věcí co jsou na sjezdovkách pro začátečníky záhadně nebezpečné"},
+{c:"Hory",q:"TOP 10 způsobů jak snowparky jsou záhadně intimidující pro normální lyžaře"},
+{c:"Hory",q:"TOP 10 věcí co každý horský záchranář zažije za sezónu"},
+{c:"Hory",q:"TOP 10 způsobů jak lyžaři z Čech versus Rakušané nebo Francouzi jsou jiní"},
+{c:"Hory",q:"TOP 10 věcí co jsou na noční sjezdovce absolutně jiné"},
+{c:"Hory",q:"TOP 10 způsobů jak sněhové dělo změní zážitek z lyžování"},
+{c:"Hory",q:"TOP 10 věcí co jsou na horské restauraci záhadně předražené"},
+{c:"Hory",q:"TOP 10 způsobů jak túra v létě a lyžování v zimě jsou záhadně podobné"},
+{c:"Hory",q:"TOP 10 věcí co jsou na zimní výbavě pro děti záhadně rychle malé"},
+{c:"Hory",q:"TOP 10 způsobů jak lyžařský dovolená s partnerem otestuje vztah"},
+{c:"Hory",q:"TOP 10 věcí co jsou na Alpách jiné než na Krkonoších"},
+// ── ABSURDNO & HUMOR ─────────────────────────────
+{c:"Absurdno",q:"TOP 10 věcí, které by dělal umělecký kurz pro kachny"},
+{c:"Absurdno",q:"TOP 10 pravidel pro správnou hru v šachy s mimozemšťany"},
+{c:"Absurdno",q:"TOP 10 způsobů jak přesvědčit chobotnici aby ti pomohla s prací"},
+{c:"Absurdno",q:"TOP 10 existenciálních krizí WiFi routeru o půlnoci"},
+{c:"Absurdno",q:"TOP 10 důvodů proč jsou ponožky ve skutečnosti filozofický problém"},
+{c:"Absurdno",q:"TOP 10 věcí co by stálo na smlouvě s ďáblem v sekci malé písmo"},
+{c:"Absurdno",q:"TOP 10 způsobů jak zombie apokalypsa zlepší provoz na dálnici D1"},
+{c:"Absurdno",q:"TOP 10 věcí, které si myslí toaster v průběhu svého pracovního dne"},
+{c:"Absurdno",q:"TOP 10 způsobů jak by vypadala vláda psů hodnocená kočkami"},
+{c:"Absurdno",q:"TOP 10 věcí co by Ikea pojmenovala pokud by pojmenovávala emoce"},
+{c:"Absurdno",q:"TOP 10 znaků, že ti soused je ve skutečnosti penzionovaný špión"},
+{c:"Absurdno",q:"TOP 10 způsobů jak holub vybírá na koho se vykálí"},
+{c:"Absurdno",q:"TOP 10 pravidel etikety pro lidi kteří žijí na Marsu od roku 2087"},
+{c:"Absurdno",q:"TOP 10 věcí co by se stalo kdyby gravitace fungovala jen v liché dny"},
+{c:"Absurdno",q:"TOP 10 způsobů jak by svět vypadal kdyby byli lidé průhlední"},
+{c:"Absurdno",q:"TOP 10 věcí co by bylo jinak kdyby čas plynul pozpátku"},
+{c:"Absurdno",q:"TOP 10 povolání která budou existovat za 100 let a budou záhadná"},
+{c:"Absurdno",q:"TOP 10 důvodů proč jsou schůdky eskalátoru záhadně posvátné pro lidi"},
+{c:"Absurdno",q:"TOP 10 věcí co by říkala GPS navigace kdyby měla existenciální krizi"},
+{c:"Absurdno",q:"TOP 10 způsobů jak by dopadl soud kde obhájcem je kočka"},
+{c:"Absurdno",q:"TOP 10 věcí co jsou záhadně vždy v zásuvce každého Čecha"},
+{c:"Absurdno",q:"TOP 10 způsobů jak by to chodilo kdybychom spali jen 2 hodiny denně"},
+{c:"Absurdno",q:"TOP 10 věcí co by robot řekl kdyby mohl zhodnotit lidské chování"},
+{c:"Absurdno",q:"TOP 10 způsobů jak by vypadalo Česko kdyby bylo monarchií"},
+{c:"Absurdno",q:"TOP 10 věcí co by se muselo stát aby se Češi začali chlubit úspěchy"},
+{c:"Absurdno",q:"TOP 10 způsobů jak by vypadal svět kdyby alkohol byl zdravý"},
+{c:"Absurdno",q:"TOP 10 věcí co by AI řekla po týdnu pozorování průměrné české domácnosti"},
+{c:"Absurdno",q:"TOP 10 způsobů jak by pes hodnotil kvalitu práce svého majitele"},
+{c:"Absurdno",q:"TOP 10 věcí co by bylo na programu konference mimozemšťanů po návštěvě Země"},
+{c:"Absurdno",q:"TOP 10 způsobů jak by probíhaly Vánoce kdyby Ježíšek byl startup founder"},
+// ── PŘÁTELSTVÍ ──────────────────────────────────
+{c:"Přátelství",q:"TOP 10 způsobů jak skupinový chat je hřbitov dobrých úmyslů"},
+{c:"Přátelství",q:"TOP 10 věcí co jsou na kamarádovi ze základky záhadně jiné po 20 letech"},
+{c:"Přátelství",q:"TOP 10 způsobů jak se 'uvidíme brzy' stane 'uvidíme za rok'"},
+{c:"Přátelství",q:"TOP 10 typů kamarádů co zmizí jakmile potřebuješ pomoc"},
+{c:"Přátelství",q:"TOP 10 věcí co říká nejlepší kamarád co ti nikdo jiný neřekne"},
+{c:"Přátelství",q:"TOP 10 způsobů jak přátelství přežije jen pokud jeden z vás odejde z práce"},
+{c:"Přátelství",q:"TOP 10 věcí co jsou na udržování přátelství v dospělosti záhadně těžké"},
+{c:"Přátelství",q:"TOP 10 způsobů jak kamarád změní po sezdání nebo po dítěti"},
+{c:"Přátelství",q:"TOP 10 věcí co každý ví o svém nejlepším kamarádovi a neprozradí"},
+{c:"Přátelství",q:"TOP 10 způsobů jak přátelství ze zahraničního pobytu přežije nebo nepřežije"},
+// ── POČASÍ ──────────────────────────────────────
+{c:"Počasí",q:"TOP 10 věcí co říkají Češi o počasí co jsou záhadně rituální"},
+{c:"Počasí",q:"TOP 10 způsobů jak první teplý den v roce změní chování lidí v parku"},
+{c:"Počasí",q:"TOP 10 věcí co jsou na českém létě záhadně krátké a proto vzácné"},
+{c:"Počasí",q:"TOP 10 způsobů jak déšť změní náladu průměrného Čecha na stupnici"},
+{c:"Počasí",q:"TOP 10 věcí co jsou na zimě bez sněhu existenciálně depresivní"},
+{c:"Počasí",q:"TOP 10 způsobů jak jaro v Česku je záhadně přesná metafora naděje"},
+{c:"Počasí",q:"TOP 10 věcí co jsou na bouřce záhadně přitažlivé pro sledování z okna"},
+{c:"Počasí",q:"TOP 10 způsobů jak 32 stupňů v kanceláři bez klimatizace mění lidi"},
+{c:"Počasí",q:"TOP 10 věcí co každý říká o vedru co jsou naprosto předvídatelné"},
+{c:"Počasí",q:"TOP 10 způsobů jak předpověď počasí nikdy nesedí přesně kdy to potřebuješ"},
+// ── NAKUPOVÁNÍ ──────────────────────────────────
+{c:"Nakupování",q:"TOP 10 způsobů jak supermarket je navržen aby jsi utratil víc"},
+{c:"Nakupování",q:"TOP 10 věcí co jsou na IKEA záhadně hypnotické"},
+{c:"Nakupování",q:"TOP 10 způsobů jak 'nakoupím jen tohle' se změní v plný košík"},
+{c:"Nakupování",q:"TOP 10 věcí co jsou na zákaznické lince absolutně frustrující"},
+{c:"Nakupování",q:"TOP 10 způsobů jak recenze na Googlu jsou záhadně nespolehlivé"},
+{c:"Nakupování",q:"TOP 10 věcí co jsou na moderním e-commerce záhadně závislostní"},
+{c:"Nakupování",q:"TOP 10 způsobů jak vrácení zboží je záhadně komplikované"},
+{c:"Nakupování",q:"TOP 10 věcí co jsou na zákaznickém věrnostním programu záhadně bezcenné"},
+{c:"Nakupování",q:"TOP 10 způsobů jak limitovaná edice vytvoří umělou touhu po zbytečnosti"},
+{c:"Nakupování",q:"TOP 10 věcí co každý kupující zažije při první koupi na Vinted nebo bazaři"},
+];
+
+// ═══════════════════════════════════════════════════
+//  API KEY MANAGEMENT
+// ═══════════════════════════════════════════════════
+let apiKey = localStorage.getItem('top10_apikey') || '';
+
+function toggleApiPanel() {
+  const body = document.getElementById('api-body');
+  const chev = document.getElementById('api-chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if(!val) { toast('Zadej API klíč'); return; }
+  if(!val.startsWith('sk-ant')) { toast('Klíč musí začínat sk-ant...'); return; }
+  apiKey = val;
+  localStorage.setItem('top10_apikey', val);
+  updateApiStatus();
+  document.getElementById('api-body').classList.remove('open');
+  document.getElementById('api-chevron').classList.remove('open');
+  toast('✅ API klíč uložen!');
+}
+
+function clearApiKey() {
+  apiKey = '';
+  localStorage.removeItem('top10_apikey');
+  document.getElementById('api-key-input').value = '';
+  updateApiStatus();
+  toast('Klíč smazán');
+}
+
+function updateApiStatus() {
+  const el = document.getElementById('api-status');
+  if(apiKey) {
+    el.textContent = '● Aktivní';
+    el.className = 'api-status ok';
+  } else {
+    el.textContent = '● Nezadán';
+    el.className = 'api-status missing';
+  }
+}
+
+// init — show masked key if exists
+if(apiKey) {
+  document.getElementById('api-key-input').value = apiKey;
+  updateApiStatus();
+}
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let allQ = [...QUESTIONS];
+let filtered = [...QUESTIONS];
+let seen = new Set();
+let favorites = JSON.parse(localStorage.getItem('top10favs')||'[]');
+let currentQ = null;
+let currentCat = 'Vše';
+
+// ═══════════════════════════════════════════════════
+//  CATEGORIES
+// ═══════════════════════════════════════════════════
+function buildCats() {
+  const cats = ['Vše', ...new Set(QUESTIONS.map(q=>q.c))];
+  const el = document.getElementById('cats');
+  el.innerHTML = cats.map(c=>`
+    <div class="cat-pill ${c==='Vše'?'active':''}" onclick="filterCat('${c}')">${c}</div>
+  `).join('');
+}
+
+function filterCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-pill').forEach(p=>{
+    p.classList.toggle('active', p.textContent===cat);
+  });
+  filtered = cat==='Vše' ? [...allQ] : allQ.filter(q=>q.c===cat);
+  seen.clear();
+  nextQuestion();
+}
+
+// ═══════════════════════════════════════════════════
+//  QUESTION DISPLAY
+// ═══════════════════════════════════════════════════
+function nextQuestion() {
+  let pool = filtered.filter(q=>!seen.has(q));
+  if(pool.length===0){ seen.clear(); pool=[...filtered]; }
+  const q = pool[Math.floor(Math.random()*pool.length)];
+  seen.add(q);
+  currentQ = q;
+  showQ(q.q, q.c, false);
+}
+
+function showQ(text, cat, ai) {
+  const card = document.getElementById('qcard');
+  card.classList.remove('anim');
+  void card.offsetWidth;
+  card.classList.add('anim');
+  document.getElementById('q-cat').innerHTML = ai
+    ? `<span class="ai-badge">✦ AI</span> ${cat}`
+    : cat;
+  document.getElementById('q-text').textContent = text;
+  const isFav = favorites.some(f=>f.q===text);
+  const fb = document.getElementById('btn-fav');
+  fb.classList.toggle('active', isFav);
+  fb.textContent = isFav ? '★' : '⭐';
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════════
+//  AI GENERATION
+// ═══════════════════════════════════════════════════
+async function generateAI() {
+  if(!apiKey) {
+    toggleApiPanel();
+    toast('Nejprve zadej API klíč ↑');
+    return;
+  }
+
+  const loading = document.getElementById('ai-loading');
+  const btn = document.getElementById('btn-ai');
+  loading.classList.add('show');
+  btn.disabled = true;
+
+  const categories = [...new Set(QUESTIONS.map(q=>q.c))];
+  const randomCat = currentCat !== 'Vše' ? currentCat : categories[Math.floor(Math.random()*categories.length)];
+  const existingSample = QUESTIONS.filter(q=>q.c===randomCat).slice(0,4).map(q=>`- ${q.q}`).join('\n');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        system: `Jsi generátor otázek pro českou party hru TOP 10. Tvým úkolem je vymyslet jednu novou, velmi vtipnou, originální a životně pravdivou otázku v kategorii "${randomCat}".
+
+Pravidla:
+- Otázka MUSÍ začínat přesně "TOP 10"
+- Musí být vtipná, lehce sarkastická, ale pravdivá
+- Piš česky, hovorově
+- Vyhni se banálním nebo obecným otázkám
+- Otázka musí být specifická a překvapivá
+- Inspiruj se stylem těchto příkladů ze stejné kategorie — ale NEkopíruj je:
+${existingSample}
+
+Odpověz POUZE samotnou otázkou. Žádné uvozovky, žádný další text.`,
+        messages: [{ role: 'user', content: `Vymysli jednu novou vtipnou TOP 10 otázku pro kategorii: ${randomCat}` }]
+      })
+    });
+
+    if(!res.ok) {
+      const err = await res.json();
+      if(res.status === 401) { toast('❌ Špatný API klíč'); }
+      else { toast('Chyba API: ' + (err.error?.message || res.status)); }
+      return;
+    }
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text?.trim();
+
+    if(text && text.toUpperCase().startsWith('TOP 10')) {
+      currentQ = { q: text, c: randomCat, ai: true };
+      showQ(text, randomCat, true);
+      toast('✦ AI vymyslela novou otázku!');
+    } else {
+      toast('Nepodařilo se — zkus znovu');
+    }
+  } catch(e) {
+    toast('Chyba připojení');
+  }
+
+  loading.classList.remove('show');
+  btn.disabled = false;
+}
+
+// ═══════════════════════════════════════════════════
+//  FAVORITES
+// ═══════════════════════════════════════════════════
+function toggleFav(e) {
+  e.stopPropagation();
+  if(!currentQ) return;
+  const idx = favorites.findIndex(f=>f.q===currentQ.q);
+  if(idx>=0) {
+    favorites.splice(idx,1);
+    toast('Odebráno z oblíbených');
+  } else {
+    favorites.push({q: currentQ.q, c: currentQ.c});
+    toast('⭐ Uloženo!');
+  }
+  localStorage.setItem('top10favs', JSON.stringify(favorites));
+  const isFav = idx<0;
+  const fb = document.getElementById('btn-fav');
+  fb.classList.toggle('active', isFav);
+  fb.textContent = isFav ? '★' : '⭐';
+  renderFavs();
+  updateStats();
+}
+
+function renderFavs() {
+  const sec = document.getElementById('fav-section');
+  const list = document.getElementById('fav-list');
+  if(favorites.length===0){ sec.style.display='none'; return; }
+  sec.style.display='block';
+  list.innerHTML = favorites.map((f,i)=>`
+    <div class="fav-item" onclick="loadFav(${i})">
+      <span class="fi-cat">${f.c}</span>
+      <span class="fi-text">${f.q}</span>
+      <span class="fi-del" onclick="deleteFav(event,${i})">✕</span>
+    </div>`).join('');
+}
+
+function loadFav(i) {
+  currentQ = favorites[i];
+  showQ(favorites[i].q, favorites[i].c, false);
+}
+
+function deleteFav(e, i) {
+  e.stopPropagation();
+  favorites.splice(i,1);
+  localStorage.setItem('top10favs', JSON.stringify(favorites));
+  renderFavs();
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════════
+//  STATS & UTILS
+// ═══════════════════════════════════════════════════
+function updateStats() {
+  document.getElementById('stat-seen').textContent = seen.size;
+  document.getElementById('stat-total').textContent = filtered.length;
+  document.getElementById('stat-fav').textContent = favorites.length;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+// Swipe
+let touchStartX = 0;
+document.getElementById('qcard').addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX; });
+document.getElementById('qcard').addEventListener('touchend', e=>{
+  if(Math.abs(e.changedTouches[0].clientX - touchStartX)>60) nextQuestion();
+});
+
+// INIT
+buildCats();
+nextQuestion();
+renderFavs();
+</script>
+</body>
+</html>
