@@ -1,0 +1,27 @@
+{
+  "name": "TOP 10 · Party Hra",
+  "short_name": "TOP 10",
+  "description": "Party generátor otázek — 450+ karet, pantomima, aktivity a AI otázky",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f0e17",
+  "theme_color": "#ff6b35",
+  "orientation": "portrait-primary",
+  "lang": "cs",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
