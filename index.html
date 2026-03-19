@@ -966,7 +966,8 @@ async function generateImage(question) {
     `;
   } catch(e) {
     if (myToken !== currentImgToken) return;
-    sec.className = 'img-section hidden';
+    sec.className = 'img-section';
+    sec.innerHTML = `<div style="padding:12px;font-size:0.78rem;color:var(--red);background:var(--card);border-radius:12px">⚠ ${e.message}</div>`;
     console.warn('Craiyon error:', e);
   }
 }
