@@ -49,12 +49,12 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 .wrap { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:16px 16px calc(80px + env(safe-area-inset-bottom)) 16px; padding-top: max(16px, env(safe-area-inset-top)); }
 
-.header { text-align:center; margin-bottom:16px; }
-.logo { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(2rem,10vw,3.5rem); font-weight:900; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; letter-spacing:-2px; }
-.logo-sub { font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--muted); margin-top:4px; font-weight:600; }
+.header { text-align:center; margin-bottom:10px; }
+.logo { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(1.4rem,7vw,2.4rem); font-weight:900; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; letter-spacing:-2px; }
+.logo-sub { font-size:0.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-top:3px; font-weight:600; }
 
 /* API KEY PANEL */
-.api-panel { background:transparent; border:1px solid var(--border); border-radius:12px; padding:10px 14px; margin-bottom:12px; }
+.api-panel { background:transparent; border:1px solid var(--border); border-radius:12px; padding:10px 14px; margin-bottom:12px; margin-top:24px; }
 .api-panel-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
 .api-panel-header h3 { font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:6px; }
 .api-status { display:inline-flex; align-items:center; gap:4px; font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:20px; }
@@ -193,21 +193,6 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     <div class="logo-sub">Party generátor · 1000+ karet + AI</div>
   </div>
 
-  <div class="api-panel">
-    <div class="api-panel-header" onclick="toggleApiPanel()">
-      <h3>🔑 Claude AI klíč <span class="api-status missing" id="api-status">● Nezadán</span></h3>
-      <span class="api-chevron" id="api-chevron">▼</span>
-    </div>
-    <div class="api-body" id="api-body">
-      <div class="api-row">
-        <input type="password" class="api-input" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off" />
-        <button class="api-save-btn" onclick="saveApiKey()">Uložit</button>
-        <button class="api-clear-btn" onclick="clearApiKey()">✕</button>
-      </div>
-      <p class="api-hint">Klíč se uloží jen do tohoto zařízení. Získáš ho na <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.</p>
-    </div>
-  </div>
-
   <div class="cats-scroll" id="cats"></div>
 
   <div class="question-card" id="qcard" onclick="nextQuestion()">
@@ -249,6 +234,21 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   <div class="fav-section" id="fav-section" style="display:none">
     <div class="fav-header"><h3>⭐ Oblíbené otázky</h3></div>
     <div class="fav-list" id="fav-list"></div>
+  </div>
+
+  <div class="api-panel">
+    <div class="api-panel-header" onclick="toggleApiPanel()">
+      <h3>🔑 Claude AI klíč <span class="api-status missing" id="api-status">● Nezadán</span></h3>
+      <span class="api-chevron" id="api-chevron">▼</span>
+    </div>
+    <div class="api-body" id="api-body">
+      <div class="api-row">
+        <input type="password" class="api-input" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off" />
+        <button class="api-save-btn" onclick="saveApiKey()">Uložit</button>
+        <button class="api-clear-btn" onclick="clearApiKey()">✕</button>
+      </div>
+      <p class="api-hint">Klíč se uloží jen do tohoto zařízení. Získáš ho na <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.</p>
+    </div>
   </div>
 </div>
 
