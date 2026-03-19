@@ -941,9 +941,7 @@ async function generateImage(question) {
     || 'funny cartoon character awkward situation colorful digital art';
 
   try {
-    const imgEl = await puter.ai.txt2img(imgPrompt + ', cartoon, funny, vibrant colors, digital art', {
-      model: 'flux-schnell'
-    });
+    const imgEl = await puter.ai.txt2img(imgPrompt + ', cartoon, funny, vibrant colors, digital art');
     if (myToken !== currentImgToken) return;
     imgEl.className = 'img-result';
     sec.className = 'img-section';
